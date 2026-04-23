@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>우와 엠블럼 최적화</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>우와모험단 - 더퍼스트 · 엠블럼 계산기</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
@@ -19,6 +22,30 @@ h1 {
 }
 .subtitle { color: #888; margin-top: 6px; font-size: 13px; }
 .version-info { color: #666; font-size: 11px; margin-top: 6px; letter-spacing: 0.3px; }
+
+#update-banner {
+  display: none;
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 9999;
+  background: linear-gradient(90deg, #ffd700, #ff6b6b);
+  color: #1a1a2e;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(255,215,0,0.5);
+  border: none;
+  font-family: inherit;
+  animation: pulseGlow 1.6s ease-in-out infinite;
+}
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 4px 20px rgba(255,215,0,0.5); }
+  50% { box-shadow: 0 4px 32px rgba(255,215,0,0.9); }
+}
+#update-banner:hover { filter: brightness(1.1); }
 
 .top-menu {
   max-width: 1400px;
@@ -588,6 +615,8 @@ tr.picked td { color: #ffd700; font-weight: bold; }
 </style>
 </head>
 <body>
+<button id="update-banner" onclick="applyUpdate()">🎉 새 버전 <span id="update-version"></span> · 탭해서 업데이트</button>
+
 <nav class="top-menu">
   <button class="menu-btn active" data-view="calculator">🧮 계산기</button>
   <button class="menu-btn" data-view="help">📖 도움말</button>
@@ -596,7 +625,7 @@ tr.picked td { color: #ffd700; font-weight: bold; }
 <header>
   <h1>우와모험단 - 더퍼스트</h1>
   <div class="subtitle">엠블럼 계산기</div>
-  <div class="version-info">Version 1.4 · made by 레인테인</div>
+  <div class="version-info">Version 1.5 · made by 레인테인</div>
 </header>
 
 <div class="view" id="view-calculator">
@@ -2235,6 +2264,42 @@ document.querySelectorAll('.role-btn').forEach(btn => {
     markStale();
   });
 });
+
+// 현재 버전 — index.html 상단의 version-info와 일치해야 함
+const APP_VERSION = '1.5';
+let latestVersion = APP_VERSION;
+
+// URL에 ?v= 파라미터가 있으면 버전 정보로 쓰고 URL은 정리 (히스토리 오염 방지)
+(function cleanVersionParam() {
+  const m = location.search.match(/[?&]v=([\d.]+)/);
+  if (m) {
+    history.replaceState(null, '', location.pathname);
+  }
+})();
+
+async function checkForUpdate() {
+  try {
+    const res = await fetch(location.pathname + '?_t=' + Date.now(), { cache: 'no-store' });
+    if (!res.ok) return;
+    const text = await res.text();
+    const m = text.match(/Version\s+([\d.]+)\s+·/);
+    if (m && m[1] !== APP_VERSION) {
+      latestVersion = m[1];
+      const banner = document.getElementById('update-banner');
+      document.getElementById('update-version').textContent = m[1];
+      banner.style.display = 'block';
+    }
+  } catch (e) {}
+}
+
+function applyUpdate() {
+  // ?v=새버전 으로 리로드 → 브라우저가 다른 URL로 인식해 캐시 우회
+  location.replace(location.pathname + '?v=' + latestVersion);
+}
+
+// 페이지 로드 3초 후 첫 체크, 이후 5분마다 재체크
+setTimeout(checkForUpdate, 3000);
+setInterval(checkForUpdate, 5 * 60 * 1000);
 
 // 상단 메뉴(계산기/도움말) 뷰 전환
 document.querySelectorAll('.menu-btn').forEach(btn => {
