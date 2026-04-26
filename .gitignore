@@ -24,3 +24,6 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+# 분석 임시 디렉토리 (영상 프레임 + Node 스크립트)
+_video_frames/
