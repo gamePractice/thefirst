@@ -953,6 +953,35 @@ tr.picked td { color: #ffd700; font-weight: bold; }
 }
 .main-skill-box .desc { font-size: 12px; color: #aaa; line-height: 1.5; }
 .main-skill-box label.radio { cursor: pointer; }
+/* DPS 계산기 스타일 */
+.dps-input { display:flex; align-items:center; gap:6px; font-size:12px; color:#ddd; }
+.dps-input span { min-width:80px; color:#bbb; }
+.dps-input input { width:100%; padding:4px 6px; background:#252538; border:1px solid #444; border-radius:4px; color:#eee; font-size:12px; }
+.emb-row { display:grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap:8px; }
+.emb-slot { background:#252538; border:1px solid #444; border-radius:6px; padding:8px; display:flex; flex-direction:column; gap:6px; }
+.emb-slot.swap-target { border-color:#4a8eff; box-shadow:0 0 0 2px rgba(74,142,255,0.3); }
+.emb-slot select { width:100%; padding:4px 6px; background:#1a1a2e; border:1px solid #555; border-radius:4px; color:#eee; font-size:12px; }
+.emb-slot .emb-info { font-size:11px; color:#aaa; line-height:1.4; min-height:14px; }
+.emb-slot .emb-icon { font-size:20px; text-align:center; }
+.emb-swap-btn { padding:4px 8px; background:#4a8eff; color:white; border:0; border-radius:4px; cursor:pointer; font-size:11px; }
+.emb-swap-btn:hover { background:#5e9bff; }
+.emb-swap-btn.cancel { background:#666; }
+.emb-swap-list { background:#1a1a2e; border:1px solid #4a8eff; border-radius:6px; padding:10px; margin-top:8px; }
+.emb-swap-list h5 { margin:0 0 8px; color:#4a8eff; font-size:13px; }
+.emb-swap-option { display:flex; justify-content:space-between; align-items:center; padding:6px 10px; background:#252538; border:1px solid #333; border-radius:4px; margin-bottom:5px; cursor:pointer; font-size:12px; }
+.emb-swap-option:hover { border-color:#4a8eff; background:#2c3050; }
+.emb-swap-option .emb-stats { color:#aaa; font-size:11px; }
+.dps-build-row { display:flex; flex-wrap:wrap; gap:5px; margin-top:6px; }
+.dps-build-emb { display:inline-flex; align-items:center; gap:4px; padding:3px 8px; background:#1a1a2e; border:1px solid #555; border-radius:12px; font-size:11px; color:#ddd; }
+.dps-build-emb.changed { border-color:#7fff7f; background:#1a3a1a; }
+.emb-swap-row { display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:8px; }
+.emb-swap-slot { background:#252538; border:1px solid #444; border-radius:6px; padding:8px; }
+.emb-swap-slot.changed { border-color:#7fff7f; background:#1a3a1a; }
+.emb-swap-slot .swap-current { font-size:11px; color:#aaa; margin-bottom:4px; }
+.emb-swap-slot .swap-arrow { color:#7fff7f; font-weight:bold; margin:0 4px; }
+.emb-swap-slot .swap-new { font-size:12px; color:#7fff7f; margin-bottom:6px; }
+.emb-swap-slot select { width:100%; padding:4px 6px; background:#1a1a2e; border:1px solid #555; border-radius:4px; color:#eee; font-size:12px; margin-bottom:4px; }
+.emb-swap-slot .reset-btn { padding:2px 8px; background:#555; color:#ddd; border:0; border-radius:3px; font-size:10px; cursor:pointer; }
 </style>
 </head>
 <body>
@@ -962,8 +991,9 @@ tr.picked td { color: #ffd700; font-weight: bold; }
   <div class="sidebar-brand">우와모험단 도우미</div>
   <div class="sidebar-menu">
     <button class="menu-btn active" data-view="home">🏠 Home</button>
-    <button class="menu-btn" data-view="calculator">🧮 계산기</button>
+    <button class="menu-btn" data-view="calculator">🧮 엠블럼 추천기</button>
     <button class="menu-btn" data-view="rune">🪬 룬 시뮬레이터</button>
+    <button class="menu-btn" data-view="crit">📊 DPS 계산기 (예측)</button>
     <button class="menu-btn" data-view="help">📖 도움말</button>
   </div>
 </nav>
@@ -976,7 +1006,7 @@ tr.picked td { color: #ffd700; font-weight: bold; }
     <div class="home-subtitle">시뮬레이터 도우미</div>
   </div>
   <div class="home-footer">
-    <span class="home-version">Version 2.5.000009</span>
+    <span class="home-version">Version 2.5.000016</span>
     <span class="home-author">made by 레인테인</span>
   </div>
 </div>
@@ -1070,6 +1100,129 @@ tr.picked td { color: #ffd700; font-weight: bold; }
 <div class="all-emblems" id="all-emblems"></div>
 
 </div><!-- /view-calculator -->
+
+<div class="view" id="view-crit" style="display:none">
+  <div style="max-width:1100px; margin:0 auto;">
+
+    <!-- Panel 1: 현재 속성 입력 -->
+    <div class="panel open" style="margin-bottom:14px;">
+      <div class="panel-head">
+        <span>🔢 현재 속성 입력</span>
+      </div>
+      <div class="panel-body">
+        <div class="hint" style="margin-bottom:12px;">
+          본인 캐릭터의 <b>속성정보 패널 값</b>을 입력하세요.
+        </div>
+
+        <h4 style="color:#ffe07a; margin:6px 0; font-size:14px;">기본 속성</h4>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:6px 12px; margin-bottom:14px;">
+          <label class="dps-input"><span>공격</span><input id="bp-atk" type="number" value="23566"></label>
+          <label class="dps-input"><span>치명</span><input id="bp-cri" type="number" value="18314"></label>
+          <label class="dps-input"><span>관통</span><input id="bp-pen" type="number" value="6631"></label>
+          <label class="dps-input"><span>명중</span><input id="bp-hit" type="number" value="3627"></label>
+          <label class="dps-input"><span>HP</span><input id="bp-hp" type="number" value="4329081"></label>
+          <label class="dps-input"><span>치명저항</span><input id="bp-cdef" type="number" value="2171"></label>
+          <label class="dps-input"><span>회피</span><input id="bp-eva" type="number" value="11099"></label>
+          <label class="dps-input"><span>방어</span><input id="bp-def" type="number" value="5878"></label>
+        </div>
+
+        <h4 style="color:#ffe07a; margin:6px 0; font-size:14px;">고급 속성 (보너스 %)</h4>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:6px 12px;">
+          <label class="dps-input"><span>공격보너스</span><input id="bp-batk" type="number" value="212.1" step="0.1">%</label>
+          <label class="dps-input"><span>치명보너스</span><input id="bp-bcri" type="number" value="252.8" step="0.1">%</label>
+          <label class="dps-input"><span>관통보너스</span><input id="bp-bpen" type="number" value="134.4" step="0.1">%</label>
+          <label class="dps-input"><span>명중보너스</span><input id="bp-bhit" type="number" value="138.8" step="0.1">%</label>
+          <label class="dps-input"><span>피해보너스</span><input id="bp-dmg" type="number" value="85.7" step="0.1">%</label>
+          <label class="dps-input"><span>HP보너스</span><input id="bp-bhp" type="number" value="148.7" step="0.1">%</label>
+          <label class="dps-input"><span>치명저항보너스</span><input id="bp-bcdef" type="number" value="134.7" step="0.1">%</label>
+          <label class="dps-input"><span>회피보너스</span><input id="bp-beva" type="number" value="214.7" step="0.1">%</label>
+          <label class="dps-input"><span>방어보너스</span><input id="bp-bdef" type="number" value="144.9" step="0.1">%</label>
+          <label class="dps-input"><span>피해감소</span><input id="bp-dr" type="number" value="36.6" step="0.1">%</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel 2: 현재 엠블럼 입력 -->
+    <div class="panel open" style="margin-bottom:14px;">
+      <div class="panel-head">
+        <span>💎 현재 엠블럼 입력 (12 슬롯)</span>
+      </div>
+      <div class="panel-body">
+        <div class="hint" style="margin-bottom:12px;">
+          착용 중인 엠블럼을 선택하세요. 카테고리별 4개씩 (총 12).
+        </div>
+
+        <h4 style="color:#ff9050; margin:6px 0; font-size:14px;">⚔️ 기교 (4)</h4>
+        <div class="emb-row" id="emb-row-기교"></div>
+
+        <h4 style="color:#9090ff; margin:10px 0 6px; font-size:14px;">🧠 지혜 (4)</h4>
+        <div class="emb-row" id="emb-row-지혜"></div>
+
+        <h4 style="color:#90ff90; margin:10px 0 6px; font-size:14px;">💚 활력 (4)</h4>
+        <div class="emb-row" id="emb-row-활력"></div>
+      </div>
+    </div>
+
+    <!-- Panel 3: DPS 예측기 -->
+    <div class="panel open" style="margin-bottom:14px;">
+      <div class="panel-head">
+        <span>📊 DPS 예측기</span>
+      </div>
+      <div class="panel-body">
+        <div class="hint" style="margin-bottom:12px;">
+          현재 빌드에서 <b>속성을 더 올리거나, 엠블럼을 바꿨을 때</b> DPS가 어떻게 변하는지 예측합니다.
+        </div>
+
+        <h4 style="color:#ffe07a; margin:8px 0; font-size:14px;">① 기본 속성 변경 (final 값 기준)</h4>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:6px 12px; margin-bottom:10px;">
+          <label class="dps-input"><span>Δ공격</span><input id="dps-dA" type="number" value="0"></label>
+          <label class="dps-input"><span>Δ치명</span><input id="dps-dC" type="number" value="0"></label>
+          <label class="dps-input"><span>Δ관통</span><input id="dps-dP" type="number" value="0"></label>
+          <label class="dps-input"><span>Δ명중</span><input id="dps-dH" type="number" value="0"></label>
+        </div>
+        <h4 style="color:#ffe07a; margin:8px 0; font-size:14px;">고급 속성 변경 (%pt)</h4>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:6px 12px; margin-bottom:14px;">
+          <label class="dps-input"><span>Δ공격보너스</span><input id="dps-dbA" type="number" value="0" step="0.1">%pt</label>
+          <label class="dps-input"><span>Δ치명보너스</span><input id="dps-dbC" type="number" value="0" step="0.1">%pt</label>
+          <label class="dps-input"><span>Δ관통보너스</span><input id="dps-dbP" type="number" value="0" step="0.1">%pt</label>
+          <label class="dps-input"><span>Δ명중보너스</span><input id="dps-dbH" type="number" value="0" step="0.1">%pt</label>
+          <label class="dps-input"><span>Δ피해보너스</span><input id="dps-dD" type="number" value="0" step="0.1">%pt</label>
+        </div>
+
+        <h4 style="color:#ffe07a; margin:8px 0; font-size:14px;">② 엠블럼 변경 (선택)</h4>
+        <div class="hint" style="font-size:12px; margin-bottom:8px;">
+          각 슬롯의 dropdown에서 변경할 엠블럼을 선택하면 옆에 변경 내역이 표시됩니다.<br>
+          이 변경은 <b>예측만</b>이며 위 "현재 엠블럼 입력"에는 영향 없음.
+        </div>
+
+        <h4 style="color:#ff9050; margin:10px 0 6px; font-size:13px;">⚔️ 기교 (4)</h4>
+        <div class="emb-swap-row" id="dps-swap-기교"></div>
+
+        <h4 style="color:#9090ff; margin:10px 0 6px; font-size:13px;">🧠 지혜 (4)</h4>
+        <div class="emb-swap-row" id="dps-swap-지혜"></div>
+
+        <h4 style="color:#90ff90; margin:10px 0 6px; font-size:13px;">💚 활력 (4)</h4>
+        <div class="emb-swap-row" id="dps-swap-활력"></div>
+
+        <div style="margin:10px 0;">
+          <button onclick="resetAllSwaps()" style="padding:5px 12px; background:#444; color:#ddd; border:1px solid #666; border-radius:4px; font-size:12px; cursor:pointer;">🔄 모든 변경 리셋</button>
+        </div>
+
+        <h4 style="color:#ffe07a; margin:8px 0; font-size:14px;">📈 예측 결과</h4>
+        <div id="dps-current" style="background:rgba(255,215,0,0.08); border:1px solid rgba(255,215,0,0.35); border-radius:8px; padding:10px; margin-bottom:10px;"></div>
+        <div id="dps-result" style="background:rgba(127,255,127,0.05); border:1px solid rgba(127,255,127,0.25); border-radius:8px; padding:12px; font-size:13px;">
+          속성 또는 엠블럼을 변경하면 결과가 나타납니다.
+        </div>
+
+        <p class="hint" style="margin-top:10px; font-size:11px; color:#999;">
+          모델: 38 datapoint (v55~v92) fit. 4개 모델 (β=0.30~1.0) 범위 출력.<br>
+          v77→v78 실측 -3% 검증: 최소 β (β=0.30, k=0.5) 모델이 가장 정확. 변동 ±5% 내는 "거의 동일"로 표시.
+        </p>
+      </div>
+    </div>
+
+  </div>
+</div>
 
 <div class="view" id="view-help" style="display:none">
   <div class="help-content guide-body">
@@ -2750,7 +2903,7 @@ document.querySelectorAll('.role-btn').forEach(btn => {
 });
 
 // 현재 버전 — index.html 상단의 version-info와 일치해야 함
-const APP_VERSION = '2.5.000009';
+const APP_VERSION = '2.5.000016';
 let latestVersion = APP_VERSION;
 
 // URL에 ?v= 파라미터가 있으면 버전 정보로 쓰고 URL은 정리 (히스토리 오염 방지)
@@ -3896,6 +4049,974 @@ function renderRuneView() {
   renderRuneResult();
 }
 
+// ===== 치명 확률 계산기 =====
+const critCalcState = { target: '치명', 공격: 17000, 관통: 5000, 치명: 12000 };
+
+function renderCritCalcInputs() {
+  const target = critCalcState.target;
+  const others = ['공격','관통','치명'].filter(k => k !== target);
+  const wrap = document.getElementById('crit-inputs');
+  wrap.innerHTML = others.map(k => `
+    <label style="display:flex; align-items:center; gap:6px; font-size:13px; color:#ddd;">
+      <span style="min-width:46px;">${k}</span>
+      <input type="number" data-crit-input="${k}" value="${critCalcState[k]}"
+        style="width:110px; padding:6px 8px; background:#252538; border:1px solid #444; border-radius:6px; color:#eee; font-size:13px;">
+    </label>
+  `).join('');
+  wrap.querySelectorAll('input[data-crit-input]').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const k = inp.dataset.critInput;
+      const v = parseFloat(inp.value);
+      critCalcState[k] = isNaN(v) ? 0 : v;
+      renderCritCalcTable();
+      renderCritSim();
+    });
+  });
+  document.getElementById('crit-table-col').textContent = '필요 ' + target;
+}
+
+function renderCritCalcTable() {
+  const target = critCalcState.target;
+  const tbody = document.getElementById('crit-table-body');
+  const rows = [];
+  for (let p = 50; p <= 100; p++) {
+    const r = p / 100;
+    let val, note = '';
+    if (target === '치명') {
+      val = r * (critCalcState.공격 + critCalcState.관통);
+    } else if (target === '관통') {
+      // 치명/(공+관) = r → 관통 = 치명/r - 공격
+      if (r === 0) { val = NaN; }
+      else val = critCalcState.치명 / r - critCalcState.공격;
+      if (val < 0) note = ' (이미 달성)';
+    } else { // 공격
+      if (r === 0) { val = NaN; }
+      else val = critCalcState.치명 / r - critCalcState.관통;
+      if (val < 0) note = ' (이미 달성)';
+    }
+    const display = isFinite(val) ? Math.round(val).toLocaleString() : '-';
+    const dim = (note !== '') ? 'opacity:0.45;' : '';
+    rows.push(`<tr style="${dim}">
+      <td style="text-align:center; font-weight:bold; color:#ddd;">${p}%</td>
+      <td style="text-align:center; color:#ffd93d;">${display}<span style="color:#888; font-size:11px;">${note}</span></td>
+    </tr>`);
+  }
+  tbody.innerHTML = rows.join('');
+}
+
+function renderCritCalc() {
+  document.querySelectorAll('input[name="crit-target"]').forEach(r => {
+    r.checked = (r.value === critCalcState.target);
+    if (!r._bound) {
+      r.addEventListener('change', () => {
+        if (r.checked) {
+          critCalcState.target = r.value;
+          renderCritCalcInputs();
+          renderCritCalcTable();
+          renderDmgCharts();
+        }
+      });
+      r._bound = true;
+    }
+  });
+  const apsInp = document.getElementById('dc-aps');
+  if (apsInp && !apsInp._bound) {
+    apsInp.addEventListener('input', renderDmgCharts);
+    apsInp._bound = true;
+  }
+  bindDcDef();
+  renderCritCalcInputs();
+  renderCritCalcTable();
+  renderDmgChartInputs();
+  renderDmgCharts();
+}
+
+function fmtBigNum(n) {
+  if (!isFinite(n)) return '-';
+  const abs = Math.abs(n);
+  if (abs >= 1e8) return (n/1e8).toFixed(2) + '억';
+  if (abs >= 1e4) return (n/1e4).toFixed(1) + '만';
+  return Math.round(n).toLocaleString();
+}
+
+const dmgChartState = {
+  공격: { final: 19578, bonus: 0 },
+  치명: { final: 10691, bonus: 0 },
+  관통: { final: 6028, bonus: 0 },
+  명중: { final: 3730, bonus: 0 },
+  피해: { final: 47 },
+};
+
+// v37 baseline (엠블럼 없음)
+const BASELINE = { 공격: 19578, 관통: 6028, 치명: 10691, 명중: 3730, 피해: 47 };
+
+// 각 엠블럼 타입 12-슬롯 풀세트의 효과 (v37→vXX 측정값)
+const EMBLEM_DELTAS = {
+  공격: { stat: 5505, dmgBonus: 21.8 },
+  관통: { stat: 4598, dmgBonus: 9.0 },
+  치명: { stat: 6255, dmgBonus: 0 },
+  명중: { stat: 3052, dmgBonus: 7.8 },
+};
+
+// v37~v41 프리셋 (각 풀세트 + 피해보너스)
+const VPRESET = {
+  v37: { 공격: 19578, 치명: 10691, 관통: 6028,  명중: 3730, 피해: 47 },
+  v38: { 공격: 25083, 치명: 10691, 관통: 6028,  명중: 3730, 피해: 68.8 },
+  v39: { 공격: 19578, 치명: 16946, 관통: 6028,  명중: 3730, 피해: 47 },
+  v40: { 공격: 19578, 치명: 10691, 관통: 10626, 명중: 3730, 피해: 56 },
+  v41: { 공격: 19578, 치명: 10691, 관통: 6028,  명중: 6782, 피해: 54.8 },
+};
+
+function bindDcDef() {
+  const inp = document.getElementById('dc-def');
+  if (inp && !inp._bound) {
+    inp.addEventListener('input', renderDmgCharts);
+    inp._bound = true;
+  }
+}
+
+// v37~v41 데이터 + 피해보너스 회귀 fit 결과 (4 datapoint, 오차 ±1.2%)
+const REG = { M: 294.0, beta: 0.556, X: 11810, Y: 17651 };
+
+function regBaseNoCrit(A, P, H, dmgBonus, defCap) {
+  if (A <= 0) return 0;
+  // 관통은 적 방어를 넘으면 효율 0 (cap)
+  const effP = (defCap != null && defCap >= 0) ? Math.min(P, defCap) : P;
+  return REG.M * Math.pow(A, REG.beta) * (1 + effP/REG.X) * (1 + H/REG.Y) * (1 + (dmgBonus||0)/100);
+}
+function regAvgPerHit(A, P, C, H, dmgBonus, defCap) {
+  // 치명확률 분모는 raw 관통 (crit rate 공식 검증됨)
+  const q = A + P;
+  const p = q > 0 ? C / q : 0;
+  return regBaseNoCrit(A, P, H, dmgBonus, defCap) * (1 + p);
+}
+
+// 엠블럼 비율 (x_A + x_P + x_C + x_H ≤ 1)에서 빌드 계산
+function buildFromFractions(fA, fP, fC, fH) {
+  return {
+    공격: BASELINE.공격 + EMBLEM_DELTAS.공격.stat * fA,
+    관통: BASELINE.관통 + EMBLEM_DELTAS.관통.stat * fP,
+    치명: BASELINE.치명 + EMBLEM_DELTAS.치명.stat * fC,
+    명중: BASELINE.명중 + EMBLEM_DELTAS.명중.stat * fH,
+    피해: BASELINE.피해
+        + EMBLEM_DELTAS.공격.dmgBonus * fA
+        + EMBLEM_DELTAS.관통.dmgBonus * fP
+        + EMBLEM_DELTAS.치명.dmgBonus * fC
+        + EMBLEM_DELTAS.명중.dmgBonus * fH,
+    fA, fP, fC, fH,
+  };
+}
+
+// 12-슬롯 엠블럼 정수 배분 (n_A + n_P + n_C + n_H = SLOTS) brute force
+function findOptimalEmblemAlloc(SLOTS, defCap) {
+  SLOTS = SLOTS || 12;
+  let bestD = -1, best = null;
+  for (let nA = 0; nA <= SLOTS; nA++) {
+    for (let nP = 0; nP <= SLOTS - nA; nP++) {
+      for (let nC = 0; nC <= SLOTS - nA - nP; nC++) {
+        const nH = SLOTS - nA - nP - nC;
+        if (nH < 0) continue;
+        const fA = nA/SLOTS, fP = nP/SLOTS, fC = nC/SLOTS, fH = nH/SLOTS;
+        const b = buildFromFractions(fA, fP, fC, fH);
+        const D = regAvgPerHit(b.공격, b.관통, b.치명, b.명중, b.피해, defCap);
+        if (D > bestD) {
+          bestD = D;
+          best = { ...b, nA, nP, nC, nH, damage: D };
+        }
+      }
+    }
+  }
+  return best;
+}
+
+function renderDmgChartInputs() {
+  const wrap = document.getElementById('dc-inputs');
+  if (!wrap) return;
+  const stats = ['공격', '치명', '관통', '명중', '피해'];
+  const presetButtons = `
+    <div style="display:flex; gap:4px; flex-wrap:wrap; margin-right:8px;">
+      ${Object.keys(VPRESET).map(k => `<button class="btn-small" style="font-size:11px; padding:4px 8px;" onclick="loadDmgPreset('${k}')">${k}</button>`).join('')}
+      <button class="btn-small primary" style="font-size:11px; padding:4px 8px;" onclick="loadOptimalEmblem()">🏆 최적 엠블럼</button>
+    </div>
+  `;
+  wrap.innerHTML = presetButtons + stats.map(k => {
+    const lbl = k === '피해' ? '피해%' : k;
+    return `<div style="display:flex; align-items:center; gap:6px; flex-wrap:nowrap;">
+      <span style="min-width:34px; font-size:12px; color:#ddd; font-weight:bold;">${lbl}</span>
+      <input type="number" data-dc="${k}" data-field="final" value="${dmgChartState[k].final}" step="${k==='피해'?'0.1':'1'}"
+        style="width:84px; padding:4px 6px; background:#252538; border:1px solid #444; border-radius:5px; color:#eee; font-size:12px;">
+    </div>`;
+  }).join('');
+  wrap.querySelectorAll('input[data-dc]').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const k = inp.dataset.dc;
+      const f = inp.dataset.field;
+      const v = parseFloat(inp.value);
+      dmgChartState[k][f] = isNaN(v) ? 0 : v;
+      renderDmgCharts();
+    });
+  });
+  // bounds 정보 표시 — 엠블럼 효과 패키지
+  const bi = document.getElementById('dc-bounds-info');
+  if (bi) {
+    bi.innerHTML = `<b style="color:#ffd700;">엠블럼 풀세트(12슬롯 모두 한 타입) 효과:</b> `
+      + Object.entries(EMBLEM_DELTAS).map(([k, v]) =>
+          `${k} <b>+${v.stat.toLocaleString()}</b> · 피해 <b>+${v.dmgBonus}%</b>`
+        ).join(' / ');
+  }
+}
+
+function loadDmgPreset(key) {
+  const p = VPRESET[key];
+  if (!p) return;
+  for (const k of ['공격','치명','관통','명중','피해']) {
+    dmgChartState[k].final = p[k];
+  }
+  renderDmgChartInputs();
+  renderDmgCharts();
+}
+
+function loadOptimalEmblem() {
+  const defInp = document.getElementById('dc-def');
+  const D_def = Math.max(0, parseFloat(defInp && defInp.value) || 0);
+  const opt = findOptimalEmblemAlloc(12, D_def);
+  if (!opt) return;
+  dmgChartState.공격.final = Math.round(opt.공격);
+  dmgChartState.치명.final = Math.round(opt.치명);
+  dmgChartState.관통.final = Math.round(opt.관통);
+  dmgChartState.명중.final = Math.round(opt.명중);
+  dmgChartState.피해.final = +opt.피해.toFixed(1);
+  renderDmgChartInputs();
+  renderDmgCharts();
+}
+
+function renderDmgCharts() {
+  const summary = document.getElementById('dc-summary');
+  const optBox = document.getElementById('dc-optimum');
+  const thead = document.getElementById('dc-thead');
+  const tbody = document.getElementById('dc-tbody');
+  if (!summary || !optBox || !thead || !tbody) return;
+
+  const A = dmgChartState.공격.final;
+  const C = dmgChartState.치명.final;
+  const P = dmgChartState.관통.final;
+  const H = dmgChartState.명중.final;
+  const DB = dmgChartState.피해.final;
+  const apsInp = document.getElementById('dc-aps');
+  const defInp = document.getElementById('dc-def');
+  const aps = Math.max(1, parseFloat(apsInp && apsInp.value) || 60);
+  const D_def = Math.max(0, parseFloat(defInp && defInp.value) || 0);
+  const mins = [5, 10, 15, 20, 25, 30];
+
+  const curAvg = regAvgPerHit(A, P, C, H, DB, D_def);
+  const curP = (A + P) > 0 ? C / (A + P) * 100 : 0;
+  const effP_cur = Math.min(P, D_def);
+
+  summary.innerHTML = `현재 치명 <b style="color:#ffd700;">${curP.toFixed(1)}%</b>`
+    + ` · 피해 <b style="color:#ffd700;">${DB}%</b>`
+    + ` · 효과적 관통 <b style="color:#ffd700;">${effP_cur.toLocaleString()}</b>${P > D_def ? ` <span style="color:#ff8a8a;">(${(P-D_def).toLocaleString()} 낭비)</span>` : ''}`
+    + ` · 1타 <b style="color:#ffd700;">${fmtBigNum(curAvg)}</b>`;
+
+  // 12-슬롯 엠블럼 정수 배분 최적화 (관통 cap 적용)
+  const opt = findOptimalEmblemAlloc(12, D_def);
+
+  // 모든 12-슬롯 분배 시나리오 (단일 타입 + 최적)
+  const rows = [];
+  rows.push({ name: '현재 빌드', A, P, C, H, 피해: DB });
+  if (opt) rows.push({
+    name: `🏆 최적 (공${opt.nA}/관${opt.nP}/치${opt.nC}/명${opt.nH})`,
+    A: opt.공격, P: opt.관통, C: opt.치명, H: opt.명중, 피해: opt.피해, isBest: true,
+  });
+  // v37~v41 프리셋
+  for (const [vk, vp] of Object.entries(VPRESET)) {
+    rows.push({ name: vk, A: vp.공격, P: vp.관통, C: vp.치명, H: vp.명중, 피해: vp.피해 });
+  }
+
+  rows.forEach(r => {
+    r.crit = (r.A + r.P) > 0 ? r.C / (r.A + r.P) * 100 : 0;
+    r.avg = regAvgPerHit(r.A, r.P, r.C, r.H, r.피해, D_def);
+  });
+  const maxAvg = Math.max(...rows.map(r => r.avg));
+
+  optBox.innerHTML = opt ? `
+    <div style="font-weight:bold; color:#ffd700; margin-bottom:6px;">🏆 12 슬롯 최적 엠블럼 배분</div>
+    <div style="color:#ddd; line-height:1.7;">
+      <b>공격 ${opt.nA}슬롯 / 관통 ${opt.nP}슬롯 / 치명 ${opt.nC}슬롯 / 명중 ${opt.nH}슬롯</b><br>
+      → 공격 <b>${Math.round(opt.공격).toLocaleString()}</b>
+      · 관통 <b>${Math.round(opt.관통).toLocaleString()}</b>
+      · 치명 <b>${Math.round(opt.치명).toLocaleString()}</b>
+      · 명중 <b>${Math.round(opt.명중).toLocaleString()}</b>
+      · 피해 <b>${opt.피해.toFixed(1)}%</b>
+      · 치명확률 <b>${(opt.치명/(opt.공격+opt.관통)*100).toFixed(1)}%</b><br>
+      평균 1타 = <b style="color:#ffd700;">${fmtBigNum(opt.damage)}</b>
+      · 30분 누적 = <b style="color:#ffd700;">${fmtBigNum(opt.damage * aps * 30)}</b>
+      ${curAvg > 0 ? `<span style="color:${opt.damage > curAvg ? '#7fff7f' : '#ff8a8a'}; font-size:12px;">&nbsp;&nbsp;(현재 대비 ${((opt.damage/curAvg-1)*100).toFixed(1)}%)</span>` : ''}
+    </div>
+  ` : `<div style="color:#ff8a8a;">⚠ 최적 해 없음</div>`;
+
+  thead.innerHTML = ['빌드','공격','관통','치명','명중','피해%','치명%','1타 평균', ...mins.map(m=>m+'분')]
+    .map(h => `<th style="text-align:center; color:#ffd700;">${h}</th>`).join('');
+
+  tbody.innerHTML = rows.map(r => {
+    const isMax = Math.abs(r.avg - maxAvg) < 0.5;
+    const bg = r.isBest ? 'background:rgba(255,215,0,0.15); font-weight:bold;'
+             : isMax ? 'background:rgba(127,255,127,0.06);'
+             : '';
+    const c = r.isBest || isMax ? '#ffd700' : '#bbb';
+    return `<tr style="${bg}">
+      <td style="text-align:center; color:${c}; font-weight:bold;">${r.name}${isMax && !r.isBest ? ' 👑' : ''}</td>
+      <td style="text-align:center; color:${c};">${Math.round(r.A).toLocaleString()}</td>
+      <td style="text-align:center; color:${c};">${Math.round(r.P).toLocaleString()}</td>
+      <td style="text-align:center; color:${c};">${Math.round(r.C).toLocaleString()}</td>
+      <td style="text-align:center; color:${c};">${Math.round(r.H).toLocaleString()}</td>
+      <td style="text-align:center; color:${c};">${(+r.피해).toFixed(1)}%</td>
+      <td style="text-align:center; color:${c};">${r.crit.toFixed(1)}%</td>
+      <td style="text-align:center; color:${c}; font-weight:bold;">${fmtBigNum(r.avg)}</td>
+      ${mins.map(m => `<td style="text-align:center; color:${c==='#ffd700'?'#ffd93d':'#999'};">${fmtBigNum(r.avg * aps * m)}</td>`).join('')}
+    </tr>`;
+  }).join('');
+}
+
+// ===== 빌드 우선순위 분석 (치명 확률 계산기 메뉴) =====
+const BP_REG = { M: 294.0, beta: 0.556, X: 11810, Y: 17651 };
+const BP_SWEET_LO = 48, BP_SWEET_HI = 56;
+
+function bpReadInputs() {
+  const get = id => parseFloat(document.getElementById(id).value) || 0;
+  return {
+    A: Math.max(1, get('bp-atk')),
+    C: Math.max(0, get('bp-cri')),
+    P: Math.max(0, get('bp-pen')),
+    H: Math.max(0, get('bp-hit')),
+    DB: Math.max(0, get('bp-dmg')),
+    D: Math.max(0, get('bp-def')),
+    E: Math.max(0, get('bp-eva')),
+  };
+}
+
+function bpDmg(s) {
+  const effP = Math.min(s.P, s.D);
+  const effH = Math.min(s.H, s.E);
+  const q = s.A + s.P;
+  const p = q > 0 ? s.C / q : 0;
+  return BP_REG.M * Math.pow(s.A, BP_REG.beta) * (1 + effP/BP_REG.X) * (1 + effH/BP_REG.Y) * (1 + s.DB/100) * (1 + p);
+}
+
+function bpCritPct(s) {
+  return (s.A + s.P) > 0 ? s.C / (s.A + s.P) * 100 : 0;
+}
+
+function renderBuildPriority() {
+  const summary = document.getElementById('bp-summary');
+  const sweet = document.getElementById('bp-sweetspot');
+  const priority = document.getElementById('bp-priority');
+  const curve = document.getElementById('bp-curve');
+  const recommend = document.getElementById('bp-recommendation');
+  if (!summary || !sweet || !priority || !curve || !recommend) return;
+
+  const s = bpReadInputs();
+  const curDmg = bpDmg(s);
+  const critPct = bpCritPct(s);
+  const sweetStatus = critPct < BP_SWEET_LO ? '⚠️ 너무 낮음 (치명 우선)'
+                    : critPct > BP_SWEET_HI ? '⚠️ 약간 과투자'
+                    : '✅ sweet spot';
+
+  summary.innerHTML = `
+    <div style="color:#ffd700; font-weight:bold; margin-bottom:4px;">📊 현재 빌드</div>
+    <div style="color:#ddd;">
+      치명확률 <b style="color:#ffd700;">${critPct.toFixed(2)}%</b>
+      &nbsp;·&nbsp; 1타 평균 <b style="color:#ffd700;">${Math.round(curDmg).toLocaleString()}</b>
+      &nbsp;·&nbsp; <b>${sweetStatus}</b>
+      ${s.P > s.D ? `<br><span style="color:#ff8a8a; font-size:12px;">⚠️ 관통 ${s.P.toLocaleString()} > 적 방어 ${s.D.toLocaleString()} → 초과분 (${(s.P-s.D).toLocaleString()}) 무효</span>` : ''}
+    </div>
+  `;
+
+  // Sweet spot bar (0~100%)
+  const barX = (pct) => `${pct}%`;
+  sweet.innerHTML = `
+    <div style="position:absolute; left:0; top:0; right:0; bottom:0;
+                background: linear-gradient(to right,
+                  #ff6b6b 0%, #ff6b6b ${BP_SWEET_LO}%,
+                  #7fff7f ${BP_SWEET_LO}%, #7fff7f ${BP_SWEET_HI}%,
+                  #ffd07a ${BP_SWEET_HI}%, #ffd07a 100%); opacity:0.3;"></div>
+    <div style="position:absolute; left:${BP_SWEET_LO}%; top:0; bottom:0; width:1px; background:#ffd700;"></div>
+    <div style="position:absolute; left:${BP_SWEET_HI}%; top:0; bottom:0; width:1px; background:#ffd700;"></div>
+    <div style="position:absolute; left:${Math.min(99, Math.max(0, critPct))}%; top:50%; transform:translate(-50%,-50%);
+                width:18px; height:36px; background:#ff3333; border:2px solid #fff; border-radius:4px; box-shadow:0 0 8px rgba(255,50,50,0.7);
+                display:flex; align-items:center; justify-content:center; font-size:9px; color:#fff; font-weight:bold;">●</div>
+    <div style="position:absolute; left:${BP_SWEET_LO}%; top:6px; color:#ffd700; font-size:10px; transform:translateX(2px);">${BP_SWEET_LO}%</div>
+    <div style="position:absolute; left:${BP_SWEET_HI}%; top:6px; color:#ffd700; font-size:10px; transform:translateX(2px);">${BP_SWEET_HI}%</div>
+    <div style="position:absolute; right:6px; bottom:4px; color:#ddd; font-size:11px;">치명확률 0% → 100%</div>
+    <div style="position:absolute; left:${Math.min(99, Math.max(0, critPct))}%; bottom:-2px; transform:translateX(-50%); color:#ff3333; font-size:11px; font-weight:bold;">현재 ${critPct.toFixed(1)}%</div>
+  `;
+
+  // Priority: stat upgrade simulation
+  // 각 stat에 standard increase 적용해서 DPS gain 계산
+  const upgrades = [
+    { name: '공격 +1000', delta: { A: 1000 } },
+    { name: '치명 +1000', delta: { C: 1000 } },
+    { name: '관통 +1000', delta: { P: 1000 } },
+    { name: '명중 +1000', delta: { H: 1000 } },
+    { name: '피해보너스 +5%pt', delta: { DB: 5 } },
+    { name: '치명보너스 +10%pt', delta: { __criBonus: 10 } }, // 치명_base × 0.1 추가 (간이)
+    { name: '공격보너스 +10%pt', delta: { __atkBonus: 10 } },
+  ];
+
+  const results = upgrades.map(u => {
+    const ns = { ...s };
+    if (u.delta.A) ns.A += u.delta.A;
+    if (u.delta.C) ns.C += u.delta.C;
+    if (u.delta.P) ns.P += u.delta.P;
+    if (u.delta.H) ns.H += u.delta.H;
+    if (u.delta.DB) ns.DB += u.delta.DB;
+    // 보너스 increase 처리: 현재 base 추정이 어려우니 효과적 stat increase로 변환
+    // 예: 치명보너스 +10%pt = 치명 base × 0.1 추가. base 추정 = 치명 / (보너스/100). 보너스 모르면 가정.
+    if (u.delta.__criBonus) {
+      // 치명_base 추정: 사용자 입력엔 보너스 없음. 평균 ~250% 가정 → base = C / 2.5
+      const base = s.C / 2.5;
+      ns.C += base * u.delta.__criBonus / 100;
+    }
+    if (u.delta.__atkBonus) {
+      const base = s.A / 2.15; // ~215% 가정
+      ns.A += base * u.delta.__atkBonus / 100;
+    }
+    const newDmg = bpDmg(ns);
+    return { name: u.name, gain: (newDmg / curDmg - 1) * 100 };
+  }).sort((a, b) => b.gain - a.gain);
+
+  const maxGain = Math.max(...results.map(r => Math.abs(r.gain)), 0.01);
+  priority.innerHTML = results.map((r, i) => {
+    const isFirst = i === 0;
+    const w = (Math.max(0, r.gain) / maxGain) * 100;
+    const color = i === 0 ? '#7fff7f' : i === 1 ? '#ffd700' : i === 2 ? '#ffe07a' : '#999';
+    return `
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:13px;">
+        <div style="min-width:140px; color:${color}; font-weight:${isFirst ? 'bold' : 'normal'};">
+          ${i+1}순위 · ${r.name}
+        </div>
+        <div style="flex:1; height:18px; background:#252538; border-radius:4px; overflow:hidden; position:relative;">
+          <div style="height:100%; width:${w}%; background:${color}; opacity:0.7;"></div>
+          <div style="position:absolute; left:6px; top:0; line-height:18px; color:#fff; font-size:11px; font-weight:bold;">
+            ${r.gain >= 0 ? '+' : ''}${r.gain.toFixed(2)}% DPS
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // DPS curve: 치명확률 0~100% 변화 시 DPS
+  const W = 800, Hh = 360;
+  const PAD = { l: 70, r: 30, t: 30, b: 50 };
+  const PW = W - PAD.l - PAD.r;
+  const PH = Hh - PAD.t - PAD.b;
+  const xCrit = pct => PAD.l + (pct / 100) * PW;
+  const points = [];
+  for (let pct = 0; pct <= 100; pct += 2) {
+    // 치명%를 그 값으로 만들려면 치명 = (pct/100) × (A+P)
+    const newC = (pct / 100) * (s.A + s.P);
+    const newS = { ...s, C: newC };
+    points.push({ pct, dmg: bpDmg(newS) });
+  }
+  const yMax = Math.max(...points.map(p => p.dmg)) * 1.05;
+  const yMin = Math.min(...points.map(p => p.dmg)) * 0.95;
+  const yScale = v => PAD.t + PH - ((v - yMin) / (yMax - yMin)) * PH;
+
+  const path = points.map((p, i) =>
+    `${i === 0 ? 'M' : 'L'}${xCrit(p.pct).toFixed(1)},${yScale(p.dmg).toFixed(1)}`
+  ).join(' ');
+
+  // Y axis labels
+  const yTicks = [yMin, (yMin+yMax)/2, yMax];
+
+  curve.innerHTML = `
+    ${[0, 25, 50, 75, 100].map(pct => `
+      <line x1="${xCrit(pct)}" y1="${PAD.t}" x2="${xCrit(pct)}" y2="${PAD.t+PH}" stroke="#333" stroke-width="0.5"/>
+      <text x="${xCrit(pct)}" y="${PAD.t+PH+18}" fill="#ccc" font-size="11" text-anchor="middle">${pct}%</text>
+    `).join('')}
+    ${yTicks.map(v => `
+      <line x1="${PAD.l}" y1="${yScale(v)}" x2="${PAD.l+PW}" y2="${yScale(v)}" stroke="#333" stroke-width="0.5"/>
+      <text x="${PAD.l-6}" y="${yScale(v)+4}" fill="#ccc" font-size="11" text-anchor="end">${fmtBigNum(v)}</text>
+    `).join('')}
+    <line x1="${PAD.l}" y1="${PAD.t}" x2="${PAD.l}" y2="${PAD.t+PH}" stroke="#888"/>
+    <line x1="${PAD.l}" y1="${PAD.t+PH}" x2="${PAD.l+PW}" y2="${PAD.t+PH}" stroke="#888"/>
+    <rect x="${xCrit(BP_SWEET_LO)}" y="${PAD.t}" width="${xCrit(BP_SWEET_HI)-xCrit(BP_SWEET_LO)}" height="${PH}" fill="#ffd700" opacity="0.08"/>
+    <text x="${(xCrit(BP_SWEET_LO)+xCrit(BP_SWEET_HI))/2}" y="${PAD.t-6}" fill="#ffd700" font-size="11" text-anchor="middle">sweet spot</text>
+    <path d="${path}" fill="none" stroke="#4dabf7" stroke-width="2"/>
+    <circle cx="${xCrit(critPct)}" cy="${yScale(curDmg)}" r="6" fill="#ff3333" stroke="#fff" stroke-width="2"/>
+    <text x="${xCrit(critPct)}" y="${yScale(curDmg)-12}" fill="#ff6b6b" font-size="11" text-anchor="middle" font-weight="bold">현재</text>
+    <text x="${(PAD.l+W-PAD.r)/2}" y="${Hh-8}" fill="#ffd700" font-size="13" text-anchor="middle">치명확률 (%)</text>
+    <text x="20" y="${(PAD.t+PH/2)}" fill="#ffd700" font-size="13" text-anchor="middle" transform="rotate(-90 20 ${PAD.t+PH/2})">예상 1타 데미지</text>
+  `;
+
+  // Recommendation — 우선순위 차트의 #1을 그대로 따라감
+  const top = results[0];
+  const top2 = results[1];
+  let recText = `<div style="background:rgba(127,255,127,0.08); border:1px solid rgba(127,255,127,0.35); border-radius:6px; padding:10px 12px; margin-bottom:8px;">
+    <b style="color:#7fff7f;">🥇 1순위: ${top.name}</b> → 약 <b>+${top.gain.toFixed(2)}% DPS</b><br>
+    <span style="color:#ddd; font-size:12px;">🥈 2순위: ${top2.name} (+${top2.gain.toFixed(2)}%)</span>
+  </div>`;
+
+  // 치명확률 영역 정보 (참고용)
+  if (critPct < BP_SWEET_LO) {
+    recText += `<div style="color:#ff8a8a; font-size:12px;">📍 치명확률 ${critPct.toFixed(1)}% — 데이터 검증 영역 (${BP_SWEET_LO}~${BP_SWEET_HI}%) 미달. 치명 효율 높을 가능성.</div>`;
+  } else if (critPct > BP_SWEET_HI) {
+    recText += `<div style="color:#ffd07a; font-size:12px;">📍 치명확률 ${critPct.toFixed(1)}% — 데이터 검증 영역 (${BP_SWEET_LO}~${BP_SWEET_HI}%) 초과. 모델은 치명을 계속 추천하지만 v45~v54 측정 범위 밖이라 실제로 다이미니싱이 더 강할 수 있음. 인게임으로 확인 권장.</div>`;
+  } else {
+    recText += `<div style="color:#7fff7f; font-size:12px;">📍 치명확률 ${critPct.toFixed(1)}% — 데이터 검증 영역 안 (모델 신뢰 ✓).</div>`;
+  }
+
+  if (s.P > s.D) {
+    recText += `<div style="color:#ff8a8a; margin-top:6px;">⚠️ 관통 ${s.P.toLocaleString()}이 적 방어 ${s.D.toLocaleString()}을 초과 — 초과분 (${(s.P-s.D).toLocaleString()})은 무효. 관통 추가 비효율.</div>`;
+  }
+  if (s.H > s.E) {
+    recText += `<div style="color:#ff8a8a; margin-top:6px;">⚠️ 명중 ${s.H.toLocaleString()}이 적 회피 ${s.E.toLocaleString()}을 초과 — 초과분 (${(s.H-s.E).toLocaleString()})은 무효. Miss 거의 안 뜨면 명중 추가 비효율.</div>`;
+  }
+
+  recText += `<div style="background:rgba(255,107,107,0.12); border:1px solid rgba(255,107,107,0.4); border-radius:6px; padding:8px 12px; margin-top:8px; color:#ffb3b3; font-size:13px; font-weight:bold;">
+    ⚠️ Miss 가 뜬다면 <span style="color:#ff6b6b;">명중부터 올리세요</span> (명중이 적 회피보다 부족한 상태). Miss 사라진 후엔 명중 추가는 효과 없음.
+  </div>`;
+  recText += `<div style="margin-top:8px; font-size:12px; color:#aaa;">
+    ⚠️ 모델 가정: v37~v54 측정 fit (β=0.556). 실제 스킬/콤보/룬 효과 별도. 인게임 DPS 결과를 우선 신뢰.
+  </div>`;
+
+  recommend.innerHTML = recText;
+}
+
+function bindBuildPriority() {
+  ['bp-atk','bp-cri','bp-pen','bp-hit','bp-dmg','bp-def','bp-eva'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && !el._bpBound) {
+      el.addEventListener('input', renderBuildPriority);
+      el._bpBound = true;
+    }
+  });
+  renderBuildPriority();
+}
+
+// ===== DPS 계산기 (예측) — 엠블럼 + 속성 통합 (2026-05-03) =====
+// 기존 `emblems` 카탈로그(line ~1421) 사용. 카테고리 키: 기교/지혜/활력.
+
+// stat 이름 → DPS 모델 키 매핑 (DPS에 영향)
+const DPS_STAT_KEYS = {
+  '공격': 'A_raw',
+  '치명': 'C_raw',
+  '관통': 'P_raw',
+  '명중': 'H_raw',
+  '공격보너스': 'bA',
+  '치명보너스': 'bC',
+  '관통보너스': 'bP',
+  '명중보너스': 'bH',
+  '피해보너스': 'D',
+};
+
+// 카테고리별 아이콘
+const EMB_CAT_ICON = { '기교': '⚔️', '지혜': '🧠', '활력': '💚' };
+
+// 현재 12 엠블럼 (v77 기준 default — 카탈로그 정확한 이름)
+let CURRENT_EMBLEMS = {
+  '기교': [
+    { name: '헬 드래곤',   grade: 5 },
+    { name: '광기 흑룡',   grade: 4 },
+    { name: '해츨링 무리', grade: 4 },
+    { name: '조소아오크',  grade: 4 },
+  ],
+  '지혜': [
+    { name: '광폭룡',         grade: 5 },
+    { name: '물 원소',        grade: 5 },
+    { name: '흡마 옵시디언',  grade: 4 },
+    { name: '샤오크',         grade: 4 },
+  ],
+  '활력': [
+    { name: '얼음 곰', grade: 5 },
+    { name: '얼음 곰', grade: 5 },
+    { name: '옵시디언', grade: 4 },
+    { name: '퀸',       grade: 4 },
+  ],
+};
+
+// EMBLEM_SWAPS[cat][slotIdx] = null (변경 없음) | { name, grade } (변경)
+let EMBLEM_SWAPS = { '기교': [null,null,null,null], '지혜': [null,null,null,null], '활력': [null,null,null,null] };
+
+function getEmblemDef(category, name) {
+  if (!emblems || !emblems[category]) return null;
+  return emblems[category].find(e => e.name === name);
+}
+
+// 엠블럼 stat 값 파싱 ("+460", "+10.5%", "+86000" 등)
+function parseStatValue(raw) {
+  if (!raw) return 0;
+  const s = String(raw).replace(/[+%]/g, '').trim();
+  return parseFloat(s) || 0;
+}
+
+// 카탈로그 엠블럼 → raw stat 객체 {A_raw, C_raw, P_raw, H_raw, bA, bC, bP, bH, D}
+function getEmblemRawStats(category, name, grade) {
+  const def = getEmblemDef(category, name);
+  const empty = { A_raw:0, C_raw:0, P_raw:0, H_raw:0, bA:0, bC:0, bP:0, bH:0, D:0 };
+  if (!def) return empty;
+  const g = def.grades[grade - 1];
+  if (!g) return empty;
+  const r = { ...empty };
+  const k1 = DPS_STAT_KEYS[def.s1];
+  const k2 = DPS_STAT_KEYS[def.s2];
+  if (k1) r[k1] = parseStatValue(g.v1);
+  if (k2) r[k2] = parseStatValue(g.v2);
+  return r;
+}
+
+// raw stat → DPS 계산용 final delta {A, C, P, H, D}
+// 사용자의 현재 보너스를 적용해서 final stat 변화 계산
+function rawToFinalDelta(raw, bonuses) {
+  const factor = (b) => 1 + (b || 0) / 100;
+  // 현재 보너스
+  const fA = factor(bonuses.bA), fC = factor(bonuses.bC),
+        fP = factor(bonuses.bP), fH = factor(bonuses.bH);
+  // 1) raw stat 추가 → final += raw × factor
+  let dA = raw.A_raw * fA;
+  let dC = raw.C_raw * fC;
+  let dP = raw.P_raw * fP;
+  let dH = raw.H_raw * fH;
+  // 2) 보너스 추가 → final += base × Δb/100, base = current_final / factor
+  if (raw.bA) dA += (bonuses.A_cur || 0) / fA * raw.bA / 100;
+  if (raw.bC) dC += (bonuses.C_cur || 0) / fC * raw.bC / 100;
+  if (raw.bP) dP += (bonuses.P_cur || 0) / fP * raw.bP / 100;
+  if (raw.bH) dH += (bonuses.H_cur || 0) / fH * raw.bH / 100;
+  return { A: dA, C: dC, P: dP, H: dH, D: raw.D || 0 };
+}
+
+// 짧은 표기용
+function statShortStr(raw) {
+  const parts = [];
+  if (raw.A_raw) parts.push(`공+${raw.A_raw}`);
+  if (raw.C_raw) parts.push(`치+${raw.C_raw}`);
+  if (raw.P_raw) parts.push(`관+${raw.P_raw}`);
+  if (raw.H_raw) parts.push(`명+${raw.H_raw}`);
+  if (raw.bA) parts.push(`공보+${raw.bA}%`);
+  if (raw.bC) parts.push(`치보+${raw.bC}%`);
+  if (raw.bP) parts.push(`관보+${raw.bP}%`);
+  if (raw.bH) parts.push(`명보+${raw.bH}%`);
+  if (raw.D) parts.push(`피+${raw.D}%`);
+  return parts.join(' ');
+}
+
+// 비-DPS stat 표기 (참고용)
+function fullStatStr(category, name, grade) {
+  const def = getEmblemDef(category, name);
+  if (!def) return '';
+  const g = def.grades[grade - 1];
+  if (!g) return '';
+  return `${def.s1}${g.v1} · ${def.s2}${g.v2}`;
+}
+
+function getEmblemIcon(category, name) {
+  return EMB_CAT_ICON[category] || '💎';
+}
+
+// 엠블럼이 보유한 유효 급수 list
+function emblemAvailableGrades(category, name) {
+  const def = getEmblemDef(category, name);
+  if (!def) return [];
+  const out = [];
+  for (let g = 1; g <= 5; g++) if (def.grades[g - 1]) out.push(g);
+  return out;
+}
+
+function renderEmblemSlots() {
+  for (const cat of ['기교', '지혜', '활력']) {
+    const row = document.getElementById(`emb-row-${cat}`);
+    if (!row) continue;
+    row.innerHTML = '';
+    CURRENT_EMBLEMS[cat].forEach((emb, idx) => {
+      const slot = document.createElement('div');
+      slot.className = 'emb-slot';
+      const def = getEmblemDef(cat, emb.name);
+      const grades = emblemAvailableGrades(cat, emb.name);
+      // grade가 사용 불가하면 가용 최고급으로 보정
+      if (grades.length && !grades.includes(emb.grade)) emb.grade = grades[grades.length-1];
+      const fullStr = fullStatStr(cat, emb.name, emb.grade);
+      const allEmb = (emblems && emblems[cat]) ? emblems[cat] : [];
+      slot.innerHTML = `
+        <div class="emb-icon">${EMB_CAT_ICON[cat]}</div>
+        <select onchange="updateEmblemName('${cat}', ${idx}, this.value)">
+          ${allEmb.map(e => `<option value="${e.name}" ${e.name===emb.name?'selected':''}>${e.name}${e.unique?' ⭐':''}</option>`).join('')}
+        </select>
+        <select onchange="updateEmblemGrade('${cat}', ${idx}, parseInt(this.value))">
+          ${grades.map(g => `<option value="${g}" ${g===emb.grade?'selected':''}>${g}급</option>`).join('')}
+        </select>
+        <div class="emb-info">${fullStr}</div>
+      `;
+      row.appendChild(slot);
+    });
+  }
+  updateDpsView();
+}
+
+function updateEmblemName(cat, idx, name) {
+  CURRENT_EMBLEMS[cat][idx].name = name;
+  // 같은 슬롯의 swap도 invalidate (이름 바뀌면 swap 의미 없어짐)
+  if (EMBLEM_SWAPS[cat]) EMBLEM_SWAPS[cat][idx] = null;
+  renderEmblemSlots();
+}
+
+function updateEmblemGrade(cat, idx, grade) {
+  CURRENT_EMBLEMS[cat][idx].grade = grade;
+  if (EMBLEM_SWAPS[cat]) EMBLEM_SWAPS[cat][idx] = null;
+  renderEmblemSlots();
+}
+
+// DPS 예측기에서 슬롯의 swap target 변경 (현재 엠블럼은 안 바뀜)
+function setSwap(cat, idx, name, grade) {
+  if (!EMBLEM_SWAPS[cat]) return;
+  if (!name) { EMBLEM_SWAPS[cat][idx] = null; }
+  else {
+    const cur = CURRENT_EMBLEMS[cat][idx];
+    // 현재와 동일하면 swap 제거
+    if (cur.name === name && cur.grade === grade) EMBLEM_SWAPS[cat][idx] = null;
+    else EMBLEM_SWAPS[cat][idx] = { name, grade };
+  }
+  updateDpsView();
+}
+
+function setSwapName(cat, idx, name) {
+  if (!name) { EMBLEM_SWAPS[cat][idx] = null; updateDpsView(); return; }
+  const grades = emblemAvailableGrades(cat, name);
+  const grade = grades[grades.length - 1] || 4;
+  setSwap(cat, idx, name, grade);
+}
+
+function setSwapGrade(cat, idx, grade) {
+  const swap = EMBLEM_SWAPS[cat][idx];
+  if (!swap) return;
+  setSwap(cat, idx, swap.name, grade);
+}
+
+function resetAllSwaps() {
+  EMBLEM_SWAPS = { '기교': [null,null,null,null], '지혜': [null,null,null,null], '활력': [null,null,null,null] };
+  updateDpsView();
+}
+
+// 모델 후보
+const TO_MODELS = [
+  { name: '최소 β (β=0.30)', beta: 0.30, k: 0.5, X: 10000, Y: 1e9, color: '#7fff7f' },
+  { name: '중간 (β=0.50)',   beta: 0.50, k: 0.5, X: 8000,  Y: 1e9, color: '#a0e0ff' },
+  { name: '메인 fit (β=0.82)', beta: 0.82, k: 0.5, X: 4659, Y: 5590, color: '#ffd070' },
+  { name: '높은 β (β=1.00)', beta: 1.00, k: 1.0, X: 5000,  Y: 1e9, color: '#ff9090' },
+];
+
+function getCurrentStats() {
+  const get = id => parseFloat((document.getElementById(id)||{}).value || 0) || 0;
+  return {
+    A: get('bp-atk'), C: get('bp-cri'), P: get('bp-pen'),
+    H: get('bp-hit'), D: get('bp-dmg'),
+  };
+}
+
+function getCurrentBonuses() {
+  const get = id => parseFloat((document.getElementById(id)||{}).value || 0) || 0;
+  const cur = getCurrentStats();
+  return {
+    bA: get('bp-batk'), bC: get('bp-bcri'), bP: get('bp-bpen'), bH: get('bp-bhit'),
+    A_cur: cur.A, C_cur: cur.C, P_cur: cur.P, H_cur: cur.H,
+  };
+}
+
+function getEmblemDelta() {
+  // 모든 swap 슬롯의 raw delta 합산 → final delta
+  const totalRaw = { A_raw:0, C_raw:0, P_raw:0, H_raw:0, bA:0, bC:0, bP:0, bH:0, D:0 };
+  for (const cat of ['기교','지혜','활력']) {
+    if (!EMBLEM_SWAPS[cat]) continue;
+    EMBLEM_SWAPS[cat].forEach((swap, idx) => {
+      if (!swap) return;
+      const cur = CURRENT_EMBLEMS[cat][idx];
+      const oldRaw = getEmblemRawStats(cat, cur.name, cur.grade);
+      const newRaw = getEmblemRawStats(cat, swap.name, swap.grade);
+      for (const k of Object.keys(totalRaw)) totalRaw[k] += (newRaw[k]||0) - (oldRaw[k]||0);
+    });
+  }
+  return rawToFinalDelta(totalRaw, getCurrentBonuses());
+}
+
+function hasAnySwap() {
+  for (const cat of ['기교','지혜','활력']) {
+    if (!EMBLEM_SWAPS[cat]) continue;
+    if (EMBLEM_SWAPS[cat].some(s => s !== null)) return true;
+  }
+  return false;
+}
+
+function toPredict(stats, m) {
+  const A = Math.max(1, stats.A);
+  const C = Math.max(0, stats.C);
+  const P = Math.max(0, stats.P);
+  const H = Math.max(0, stats.H);
+  const D = Math.max(0, stats.D);
+  const p = Math.min(1, C / (A + P));
+  const Pterm = 1 + P / m.X;
+  const Hterm = 1 + H / m.Y;
+  return Math.pow(A, m.beta) * Pterm * Hterm * (1 + D/100) * (1 + m.k * p);
+}
+
+function getStatDelta() {
+  const get = id => parseFloat((document.getElementById(id)||{}).value || 0) || 0;
+  // 기본 stat (final 단위) + 보너스 변경 (%pt → final delta로 환산)
+  const bonuses = getCurrentBonuses();
+  const factor = (b) => 1 + (b || 0) / 100;
+  const dbA = get('dps-dbA'), dbC = get('dps-dbC'), dbP = get('dps-dbP'), dbH = get('dps-dbH');
+  // base × Δb/100
+  const fromBA = (bonuses.A_cur || 0) / factor(bonuses.bA) * dbA / 100;
+  const fromBC = (bonuses.C_cur || 0) / factor(bonuses.bC) * dbC / 100;
+  const fromBP = (bonuses.P_cur || 0) / factor(bonuses.bP) * dbP / 100;
+  const fromBH = (bonuses.H_cur || 0) / factor(bonuses.bH) * dbH / 100;
+  return {
+    A: get('dps-dA') + fromBA,
+    C: get('dps-dC') + fromBC,
+    P: get('dps-dP') + fromBP,
+    H: get('dps-dH') + fromBH,
+    D: get('dps-dD'),
+  };
+}
+
+function updateDpsView() {
+  // === ② 엠블럼 변경 (12 슬롯, 카테고리별) ===
+  for (const cat of ['기교','지혜','활력']) {
+    const row = document.getElementById(`dps-swap-${cat}`);
+    if (!row) continue;
+    let html = '';
+    CURRENT_EMBLEMS[cat].forEach((cur, idx) => {
+      const swap = EMBLEM_SWAPS[cat][idx];
+      const isChanged = swap !== null;
+      const allEmb = (emblems && emblems[cat]) ? emblems[cat] : [];
+      const selectedName = swap ? swap.name : cur.name;
+      const selectedGrade = swap ? swap.grade : cur.grade;
+      const grades = emblemAvailableGrades(cat, selectedName);
+      html += `
+        <div class="emb-swap-slot ${isChanged ? 'changed' : ''}">
+          <div class="swap-current">현재: <b>${cur.name} ${cur.grade}급</b>${isChanged ? `<span class="swap-arrow">→</span><b style="color:#7fff7f;">${swap.name} ${swap.grade}급</b>` : ''}</div>
+          <select onchange="setSwapName('${cat}', ${idx}, this.value)">
+            <option value="">-- 변경 안 함 --</option>
+            ${allEmb.map(e => `<option value="${e.name.replace(/"/g, '&quot;')}" ${e.name===selectedName && isChanged ? 'selected' : ''}>${e.name}${e.unique?' ⭐':''}</option>`).join('')}
+          </select>
+          ${isChanged ? `
+          <select onchange="setSwapGrade('${cat}', ${idx}, parseInt(this.value))">
+            ${grades.map(g => `<option value="${g}" ${g===selectedGrade?'selected':''}>${g}급</option>`).join('')}
+          </select>
+          <button class="reset-btn" onclick="setSwap('${cat}', ${idx}, null, null)">리셋</button>
+          ` : ''}
+        </div>`;
+    });
+    row.innerHTML = html;
+  }
+
+  // === 현재 빌드 + 예측 결과 ===
+  const cur = getCurrentStats();
+  const oldP = cur.A + cur.P > 0 ? cur.C / (cur.A + cur.P) : 0;
+  const statD = getStatDelta();
+  const embD = getEmblemDelta();
+  const delta = {
+    A: statD.A + embD.A, C: statD.C + embD.C, P: statD.P + embD.P,
+    H: statD.H + embD.H, D: statD.D + embD.D,
+  };
+
+  // 현재 빌드 카드
+  const curEl = document.getElementById('dps-current');
+  if (curEl) {
+    curEl.innerHTML = `<div style="font-size:13px; line-height:1.6;">
+      <span style="color:#aaa;">현재 빌드:</span>
+      공 <b>${cur.A}</b> · 치 <b>${cur.C}</b> · 관 <b>${cur.P}</b> · 명 <b>${cur.H}</b> · 피 <b>${cur.D}%</b>
+      · 치명% <b>${(oldP*100).toFixed(1)}%</b>
+    </div>`;
+  }
+
+  const resultEl = document.getElementById('dps-result');
+  if (!resultEl) return;
+
+  const allZero = Math.abs(delta.A) < 0.01 && Math.abs(delta.C) < 0.01 && Math.abs(delta.P) < 0.01 && Math.abs(delta.H) < 0.01 && Math.abs(delta.D) < 0.01;
+  if (allZero && !hasAnySwap()) {
+    resultEl.innerHTML = '<span style="color:#aaa; font-size:12px;">속성 또는 엠블럼을 변경하면 예측 결과가 나타납니다.</span>';
+    return;
+  }
+
+  const next = {
+    A: cur.A + delta.A, C: cur.C + delta.C, P: cur.P + delta.P,
+    H: cur.H + delta.H, D: cur.D + delta.D,
+  };
+  const newP = next.A + next.P > 0 ? next.C / (next.A + next.P) : 0;
+
+  const results = TO_MODELS.map(m => {
+    const oldDPS = toPredict(cur, m);
+    const newDPS = toPredict(next, m);
+    return { ...m, pct: (newDPS / oldDPS - 1) * 100 };
+  });
+  const minP = Math.min(...results.map(r => r.pct));
+  const maxP = Math.max(...results.map(r => r.pct));
+  const meanP = results.reduce((s, r) => s + r.pct, 0) / results.length;
+
+  let verdict, verdictColor;
+  if (minP > 1) { verdict = '🟢 거의 모든 모델에서 좋은 swap. 진행 추천.'; verdictColor = '#7fff7f'; }
+  else if (maxP < -1) { verdict = '🔴 거의 모든 모델에서 나쁜 swap. 비추천.'; verdictColor = '#ff7070'; }
+  else if (meanP > 0.5) { verdict = '🟡 평균적으로 약간 좋음. 진행 가능.'; verdictColor = '#ffd070'; }
+  else if (meanP < -0.5) { verdict = '🟡 평균적으로 약간 나쁨. 비추천.'; verdictColor = '#ffa050'; }
+  else { verdict = '⚪ 차이 미미 (모델 불확실성 내). 다른 요인으로 결정.'; verdictColor = '#aaa'; }
+
+  const r0 = v => Math.round(v);
+  const r1 = v => (Math.round(v * 10) / 10).toFixed(1);
+  const sgn = v => { const r = r0(v); return r >= 0 ? `+${r}` : `${r}`; };
+  const sgn1 = v => v >= 0 ? `+${r1(v)}` : `${r1(v)}`;
+  const col = v => v > 0.5 ? '#7fff7f' : v < -0.5 ? '#ff7070' : '#ddd';
+  let html = `
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:12px;">
+      <div>
+        <div style="color:#aaa; font-size:11px; margin-bottom:4px;">현재</div>
+        <div style="font-size:12px; line-height:1.6;">
+          공 ${cur.A} · 치 ${cur.C} · 관 ${cur.P}<br>
+          명 ${cur.H} · 피 ${cur.D}%<br>
+          치명%: <b>${(oldP*100).toFixed(1)}%</b>
+        </div>
+      </div>
+      <div>
+        <div style="color:#aaa; font-size:11px; margin-bottom:4px;">변경 후</div>
+        <div style="font-size:12px; line-height:1.6;">
+          공 <b style="color:${col(delta.A)}">${r0(next.A)}</b> (${sgn(delta.A)}) · 치 <b style="color:${col(delta.C)}">${r0(next.C)}</b> (${sgn(delta.C)})<br>
+          관 <b style="color:${col(delta.P)}">${r0(next.P)}</b> (${sgn(delta.P)}) · 명 <b style="color:${col(delta.H)}">${r0(next.H)}</b> (${sgn(delta.H)})<br>
+          피 <b style="color:${col(delta.D)}">${r1(next.D)}%</b> (${sgn1(delta.D)}) · 치명%: <b>${(newP*100).toFixed(1)}%</b>
+        </div>
+      </div>
+    </div>
+    <table style="width:100%; border-collapse:collapse; font-size:12px; margin-bottom:10px;">
+      <thead>
+        <tr style="border-bottom:1px solid #555;"><th style="text-align:left; padding:5px 6px; color:#aaa; font-weight:normal;">모델</th><th style="text-align:right; padding:5px 6px; color:#aaa; font-weight:normal;">예측 ΔDPS</th></tr>
+      </thead>
+      <tbody>
+        ${results.map(r => `<tr style="border-bottom:1px solid #2a2a3e;">
+          <td style="padding:5px 6px;"><span style="display:inline-block; width:8px; height:8px; background:${r.color}; border-radius:50%; margin-right:6px;"></span>${r.name}</td>
+          <td style="text-align:right; padding:5px 6px; color:${r.pct>0?'#7fff7f':r.pct<0?'#ff7070':'#ddd'};"><b>${r.pct>=0?'+':''}${r.pct.toFixed(2)}%</b></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; padding:8px 10px; background:rgba(0,0,0,0.3); border-radius:6px; margin-bottom:8px;">
+      <span style="font-size:11px; color:#aaa;">범위</span>
+      <b style="font-size:13px;">${minP>=0?'+':''}${minP.toFixed(2)}% ~ ${maxP>=0?'+':''}${maxP.toFixed(2)}%</b>
+      <span style="font-size:11px; color:#aaa;">평균</span>
+      <b style="font-size:13px;">${meanP>=0?'+':''}${meanP.toFixed(2)}%</b>
+    </div>
+    <div style="text-align:center; font-size:14px; padding:8px; background:rgba(255,255,255,0.04); border-radius:6px; color:${verdictColor};">
+      <b>${verdict}</b>
+    </div>
+  `;
+  resultEl.innerHTML = html;
+}
+
+// stat input 변경 시 재계산
+['bp-atk','bp-cri','bp-pen','bp-hit','bp-dmg',
+ 'bp-batk','bp-bcri','bp-bpen','bp-bhit',
+ 'dps-dA','dps-dC','dps-dP','dps-dH','dps-dD',
+ 'dps-dbA','dps-dbC','dps-dbP','dps-dbH'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', () => {
+    if (document.getElementById('view-crit').style.display !== 'none') updateDpsView();
+  });
+});
+
 // 상단 메뉴(계산기/도움말) 뷰 전환
 document.querySelectorAll('.menu-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -3905,8 +5026,10 @@ document.querySelectorAll('.menu-btn').forEach(btn => {
     document.getElementById('view-home').style.display = view === 'home' ? '' : 'none';
     document.getElementById('view-calculator').style.display = view === 'calculator' ? '' : 'none';
     document.getElementById('view-rune').style.display = view === 'rune' ? '' : 'none';
+    document.getElementById('view-crit').style.display = view === 'crit' ? '' : 'none';
     document.getElementById('view-help').style.display = view === 'help' ? '' : 'none';
     if (view === 'rune') renderRuneView();
+    if (view === 'crit') renderEmblemSlots();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 });
