@@ -1347,7 +1347,7 @@ tr.picked td { color: #ffd700; font-weight: bold; }
     </div>
     <div class="rune-combat-row">
       <label for="rune-combat-time">⏱️ 전투시간</label>
-      <input type="number" id="rune-combat-time" min="5" max="600" step="1" value="60">
+      <input type="number" id="rune-combat-time" min="5" max="3600" step="1" value="60">
       <span class="suffix">초</span>
       <span style="margin-left:auto; color:#888; font-size:12px;">평타는 1초당 1회로 가정합니다.</span>
     </div>
@@ -3215,7 +3215,7 @@ function saveSelection() { try { localStorage.setItem('runeSelection_v1', JSON.s
 let runeCombatTime = 60;
 try {
   const saved = localStorage.getItem('runeCombatTime_v1');
-  if (saved) runeCombatTime = Math.max(5, Math.min(600, parseInt(saved) || 60));
+  if (saved) runeCombatTime = Math.max(5, Math.min(3600, parseInt(saved) || 60));
 } catch (e) {}
 
 // ─── 시뮬레이션 엔진 ───────────────────────────────────────────────────────
@@ -3941,12 +3941,14 @@ function drawDpsGraph(tickTotal, tickPerSkill, TICK, combatTime) {
     const v = maxDps * (1 - i / 4);
     g.textAlign = 'right'; g.fillText(v.toFixed(1), padL - 6, y + 4);
   }
-  // X축 눈금: 1초 단위 고정
+  // X축 눈금: 전투시간 1/10 단위 (11개)
   g.textAlign = 'center';
-  for (let t = 0; t <= combatTime; t += 1) {
-    const x = padL + (W * t) / combatTime;
+  for (let i = 0; i <= 10; i++) {
+    const t = combatTime * i / 10;
+    const x = padL + (W * i) / 10;
     g.beginPath(); g.moveTo(x, padT); g.lineTo(x, padT + H); g.stroke();
-    g.fillText(t + 's', x, padT + H + 16);
+    const label = (Number.isInteger(t) ? t : t.toFixed(1)) + 's';
+    g.fillText(label, x, padT + H + 16);
   }
 
   // 스킬별 DPS (얇게) — 기본/코어/전술/궁극
@@ -4022,7 +4024,7 @@ function renderRuneView() {
   if (ct && !ct._bound) {
     ct.value = runeCombatTime;
     ct.addEventListener('input', () => {
-      const v = Math.max(5, Math.min(600, parseInt(ct.value) || 60));
+      const v = Math.max(5, Math.min(3600, parseInt(ct.value) || 60));
       runeCombatTime = v;
       try { localStorage.setItem('runeCombatTime_v1', String(v)); } catch (e) {}
       renderRuneResult();
