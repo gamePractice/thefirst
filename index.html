@@ -809,6 +809,15 @@ tr.picked td { color: #ffd700; font-weight: bold; }
   font-size: 10px; cursor: pointer; font-family: inherit;
 }
 .rune-edit-form .reset-btn:hover { color: #ff9999; border-color: #ff6b6b; }
+.rune-edit-form .apply-btn {
+  background: #4a5fb1; color: #fff; border: 1px solid #6a7fd1;
+  padding: 4px 10px; border-radius: 3px;
+  font-size: 11px; font-weight: bold; cursor: pointer; font-family: inherit;
+  margin-left: 6px;
+}
+.rune-edit-form .apply-btn:hover { background: #5a6fc1; }
+.rune-edit-form .apply-btn.dirty { background: #c19135; border-color: #ffd93d; }
+.rune-edit-form .apply-btn.dirty:hover { background: #d1a145; }
 .rune-card .rune-pick-badge {
   position: absolute; top: -6px; right: -6px;
   background: #ffd700; color: #1a1a2e;
@@ -3641,6 +3650,7 @@ function renderRunePoolGroup(pool, gridId) {
         }).join('')}
         <div class="field full" style="text-align:right;">
           <button class="reset-btn" data-reset="${r.id}" data-pool="${pool}">↺ 기본값 복원</button>
+          <button class="apply-btn" data-apply="${r.id}" data-pool="${pool}">✓ 적용</button>
         </div>
       </div>
     ` : '';
@@ -3675,10 +3685,26 @@ function renderRunePoolGroup(pool, gridId) {
         renderRunePool();
       });
     }
+    const applyBtn = card.querySelector('[data-apply]');
+    const markDirty = () => { if (applyBtn) applyBtn.classList.add('dirty'); };
     card.querySelectorAll('input[data-rune], select[data-rune]').forEach(inp => {
-      inp.addEventListener('change', onRuneFieldChange);
-      if (inp.tagName === 'INPUT') inp.addEventListener('input', onRuneFieldChange);
+      inp.addEventListener('input', markDirty);
+      inp.addEventListener('change', markDirty);
+      if (inp.tagName === 'INPUT') {
+        inp.addEventListener('keydown', e => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            applyRuneEdits(r.id, pool, card);
+          }
+        });
+      }
     });
+    if (applyBtn) {
+      applyBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        applyRuneEdits(r.id, pool, card);
+      });
+    }
     const resetBtn = card.querySelector('[data-reset]');
     if (resetBtn) {
       resetBtn.addEventListener('click', e => {
@@ -3690,24 +3716,21 @@ function renderRunePoolGroup(pool, gridId) {
   });
 }
 
-function onRuneFieldChange(e) {
-  e.stopPropagation();
-  const id = e.target.dataset.rune;
-  const pool = e.target.dataset.pool;
+function applyRuneEdits(id, pool, card) {
   const r = runes[pool].find(x => x.id === id);
   if (!r) return;
-
-  if (e.target.dataset.meta) {
-    const meta = e.target.dataset.meta;
-    const v = e.target.value;
-    r[meta] = (meta === 'star') ? (parseInt(v) || 1) : v;
-  } else if (e.target.dataset.effect !== undefined) {
-    const ei = +e.target.dataset.effect;
-    const field = e.target.dataset.field;
-    const v = parseFloat(e.target.value) || 0;
-    if (r.effects && r.effects[ei]) r.effects[ei][field] = v;
-  }
-  // 전체 룬 상태를 오버라이드로 저장
+  card.querySelectorAll('[data-rune]').forEach(el => {
+    if (el.dataset.meta) {
+      const meta = el.dataset.meta;
+      const v = el.value;
+      r[meta] = (meta === 'star') ? (parseInt(v) || 1) : v;
+    } else if (el.dataset.effect !== undefined) {
+      const ei = +el.dataset.effect;
+      const field = el.dataset.field;
+      const v = parseFloat(el.value) || 0;
+      if (r.effects && r.effects[ei]) r.effects[ei][field] = v;
+    }
+  });
   runeOverrides[id] = {
     grade: r.grade, star: r.star,
     effects: clone(r.effects || []),
