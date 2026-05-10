@@ -615,6 +615,8 @@ table.grade-table .grade-max { color: #aaa; font-size: 11px; }
 
 .final-summary { max-width: 1400px; margin: 22px auto 0; }
 .final-summary:empty { display: none; }
+.gem-rec { max-width: 1400px; margin: 22px auto 0; }
+.gem-rec:empty { display: none; }
 .final-summary-box {
   background: linear-gradient(135deg, rgba(74,95,193,0.08), rgba(255,215,0,0.05));
   border: 1px solid rgba(138,160,232,0.3);
@@ -1047,6 +1049,23 @@ tr.picked td { color: #ffd700; font-weight: bold; }
   </div>
 </div>
 
+<div class="panel open" id="gems-panel" style="display:none;">
+  <div class="panel-head" onclick="togglePanel('gems-panel')">
+    <span>💎 현재 보석 (딜러용 · 7급 기준 +193 raw)</span>
+    <span class="caret">▶</span>
+  </div>
+  <div class="panel-body">
+    <div class="hint">
+      각 장비마다 보석 2개 장착. 7급 기준 모든 stat <b>+193 raw</b>. 슬롯별 변경 가능 종류 제한 있음.<br>
+      <b>① 먼저 본인의 실제 보석 구성을 등록</b>하세요 (미장착 → 실제 보석 선택 시 final 스탯 변동 없음).<br>
+      <b>② 아래 "내 최종 스탯"</b>에 게임에서 보이는 값(보석 포함)을 그대로 입력.<br>
+      <b>③ 등록 후 보석 변경/제거</b>는 자동 동기화: 이전 보석 effect 제거 + 새 보석 effect 추가.<br>
+      <span style="color:#7fff7f;">▶</span> ⭐ = 슬롯별 ΔDPS 최대 stat 추천.
+    </div>
+    <div id="gems-grid" style="margin-top:10px;"></div>
+  </div>
+</div>
+
 <div class="panel" id="stats-panel">
   <div class="panel-head" onclick="togglePanel('stats-panel')">
     <span>🔢 내 최종 스탯 & 목표값</span>
@@ -1104,6 +1123,7 @@ tr.picked td { color: #ffd700; font-weight: bold; }
 <div class="exclusion-bar" id="exclusion-bar"></div>
 
 <div class="groups" id="groups"></div>
+<div class="gem-rec" id="gem-rec"></div>
 <div class="final-summary" id="final-summary"></div>
 <div class="rating-ranking" id="rating-ranking"></div>
 <div class="all-emblems" id="all-emblems"></div>
@@ -1147,6 +1167,15 @@ tr.picked td { color: #ffd700; font-weight: bold; }
           <label class="dps-input"><span>회피보너스</span><input id="bp-beva" type="number" value="214.7" step="0.1">%</label>
           <label class="dps-input"><span>방어보너스</span><input id="bp-bdef" type="number" value="144.9" step="0.1">%</label>
           <label class="dps-input"><span>피해감소</span><input id="bp-dr" type="number" value="36.6" step="0.1">%</label>
+        </div>
+
+        <h4 style="color:#ff9090; margin:14px 0 6px; font-size:14px;">🎯 대상 (적) 정보</h4>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:6px 12px;">
+          <label class="dps-input"><span>대상 방어</span><input id="bp-tdef" type="number" value="0"></label>
+        </div>
+        <div class="hint" style="font-size:11px; margin-top:6px; color:#999;">
+          eff_A = 공격 − max(0, 대상방어 − 관통). 관통이 대상방어 미만이면 차감, 이상이면 풀반영.<br>
+          <b>허수아비 적정 관통 약 9000</b>. <b>0</b> 입력 시 over-pierce 가정 (관통 변화 무시).
         </div>
       </div>
     </div>
@@ -1223,9 +1252,24 @@ tr.picked td { color: #ffd700; font-weight: bold; }
           속성 또는 엠블럼을 변경하면 결과가 나타납니다.
         </div>
 
+        <div style="margin-top:14px; padding:10px 12px; background:rgba(255,215,0,0.06); border:1px solid rgba(255,215,0,0.25); border-radius:6px; font-size:12px; line-height:1.7;">
+          <div style="color:#ffe07a; font-weight:bold; margin-bottom:6px;">📌 스탯 우선순위 가이드 (허수아비 적정 관통 약 9000)</div>
+          <div style="color:#ddd;">
+            <b style="color:#ffd070;">0순위</b> 피해보너스 — 항상 최강, sum_raw에 곱연산<br>
+            <b style="color:#ffd070;">1순위</b> 명중 — miss 뜨면 추가, 안 뜨면 효과 0<br>
+            <b style="color:#ffd070;">2순위</b> 관통 (적정값까지) / 공격 / 치명 — <b>raw 1점당 동일 효율</b><br>
+            <span style="color:#aaa; font-size:11px;">→ 관통은 적정값(약 9000)에서 cap. 그 외엔 raw 1점 = 1점이라 어떤 stat에 투자해도 동일 DPS.<br>
+              (단 final 기준 효율은 보너스%가 다르므로 차이남: 공격 보너스 222%면 final 1점당 raw 0.45점)</span>
+          </div>
+          <div style="margin-top:8px; padding-top:8px; border-top:1px dashed rgba(255,215,0,0.2); color:#bbb; font-size:11px;">
+            <b style="color:#ffd070;">모델 변경 (2026-05-10):</b> 중국 서버 컨센서스 "raw 1점 = 1점" 적용. 우리 16점 측정 (1.27:1)도 ±20% noise 안에서 호환.<br>
+            DPS ∝ sum_raw<sup>1.09</sup> × (1 + 피해보너스/100). 측정 RMS 1.5%.
+          </div>
+        </div>
         <p class="hint" style="margin-top:10px; font-size:11px; color:#999;">
-          모델: 38 datapoint (v55~v92) fit. 4개 모델 (β=0.30~1.0) 범위 출력.<br>
-          v77→v78 실측 -3% 검증: 최소 β (β=0.30, k=0.5) 모델이 가장 정확. 변동 ±5% 내는 "거의 동일"로 표시.
+          모델 (2026-05-10 raw-sum, 중국 서버 컨센서스 적용): <b>DPS ∝ sum_raw<sup>1.09</sup> × (1+D%)</b><br>
+          sum_raw = 공격_raw + 치명_raw + min(관통, 대상방어)_raw. raw = final / (보너스%/100).<br>
+          명중은 miss-threshold만 넘으면 효과 없음으로 가정 (모델 미반영).
         </p>
       </div>
     </div>
@@ -1597,6 +1641,11 @@ function exclusionKey(name, grade) { return name + '#' + grade; }
 function isExcluded(name, grade) {
   return userStats && Array.isArray(userStats.excluded) && userStats.excluded.includes(exclusionKey(name, grade));
 }
+// non-unique 엠블 일부 제외 (1개만 보유 등): 풀에서 max - count 만큼만 후보로 사용
+function partialExcludedCount(name, grade) {
+  if (!userStats.partialExcluded) return 0;
+  return userStats.partialExcluded[exclusionKey(name, grade)] || 0;
+}
 // 제외 목록을 반영한, 해당 엠블럼의 가장 높은 유효 급수
 function emblemAtGrade(emblem) {
   for (let g = 5; g >= 1; g--) {
@@ -1631,6 +1680,18 @@ const DEFENSE_PAIRS = ['HP','방어','치명저항','회피'];
 const STAT_PAIRS = [...OFFENSE_PAIRS, ...DEFENSE_PAIRS];
 const EXTRA_STATS = ['피해보너스','피해감소'];
 
+// 보석 (딜러용) — 장비별 2슬롯, 7급 raw +193
+const GEM_PIECES = ['무기','견갑','장갑','반지','목걸이'];
+const GEM_OPTIONS = {
+  무기:   ['공격','치명','명중'],
+  견갑:   ['공격','명중','관통'],
+  장갑:   ['치명','명중','관통'],
+  반지:   ['공격','치명','관통'],
+  목걸이: ['공격','치명','관통'],
+};
+const GEM_VALUE = 193; // 7급 raw 수치 (모든 stat 동일)
+const GEM_LEVEL_LABEL = '7급';
+
 const DEFAULT_USER_STATS = {
   pairs: {
     공격:   { final: 17338, bonusPct: 195.7 },
@@ -1655,7 +1716,16 @@ const DEFAULT_USER_STATS = {
     회피: 0,      // 최종 수치
   },
   currentEmblems: { 기교: ['','','',''], 지혜: ['','','',''], 활력: ['','','',''] },
-  excluded: [], // "엠블럼명#급수" 형식. 해당 급수를 만들 수 없어 제외한 항목들
+  excluded: [], // "엠블럼명#급수" 형식. 해당 급수를 만들 수 없어 제외한 항목들 (전체 제외)
+  partialExcluded: {}, // {"엠블럼명#급수": 제외할 개수}. non-unique 2개 중 1개만 제외 등.
+  // 보석 (딜러용): 장비별 [slot1, slot2]. 빈 문자열 = 미장착. 기본 = 모두 미장착.
+  gems: {
+    무기:   ['',''],
+    견갑:   ['',''],
+    장갑:   ['',''],
+    반지:   ['',''],
+    목걸이: ['',''],
+  },
 };
 
 const presets = {
@@ -1735,6 +1805,21 @@ for (const g of ['기교','지혜','활력']) {
   while (userStats.currentEmblems[g].length < 4) userStats.currentEmblems[g].push('');
 }
 if (!Array.isArray(userStats.excluded)) userStats.excluded = [];
+if (!userStats.partialExcluded || typeof userStats.partialExcluded !== 'object') userStats.partialExcluded = {};
+
+// 보석 마이그레이션
+if (!userStats.gems || typeof userStats.gems !== 'object') {
+  userStats.gems = JSON.parse(JSON.stringify(DEFAULT_USER_STATS.gems));
+}
+for (const piece of GEM_PIECES) {
+  if (!Array.isArray(userStats.gems[piece])) {
+    userStats.gems[piece] = [GEM_OPTIONS[piece][0], GEM_OPTIONS[piece][0]];
+  }
+  while (userStats.gems[piece].length < 2) userStats.gems[piece].push('');
+  // invalid 값 정리: 슬롯 옵션에 없는 stat은 '' 처리
+  userStats.gems[piece] = userStats.gems[piece].slice(0, 2).map(s =>
+    GEM_OPTIONS[piece].includes(s) ? s : '');
+}
 
 // 레거시 마이그레이션: "이름"(급수 없음) → "이름#최대급수"로 자동 변환
 (function migrateLegacyCurrentEmblems() {
@@ -1770,11 +1855,29 @@ function removeExclusion(key) {
   computeResults();
 }
 function clearExclusions() {
-  if (userStats.excluded.length === 0) return;
+  const partialKeys = Object.keys(userStats.partialExcluded || {});
+  if (userStats.excluded.length === 0 && partialKeys.length === 0) return;
   if (!confirm('제외된 급수 목록을 모두 해제할까요?')) return;
   userStats.excluded = [];
+  userStats.partialExcluded = {};
   saveUserStats();
   computeResults();
+}
+// 1개만 제외 (non-unique 엠블에서 보유 카피 줄이기)
+function excludeOne(name, grade) {
+  const key = exclusionKey(name, grade);
+  if (!userStats.partialExcluded) userStats.partialExcluded = {};
+  userStats.partialExcluded[key] = (userStats.partialExcluded[key] || 0) + 1;
+  saveUserStats();
+  computeResults();
+}
+function removePartialExclusion(name, grade) {
+  const key = exclusionKey(name, grade);
+  if (userStats.partialExcluded && userStats.partialExcluded[key]) {
+    delete userStats.partialExcluded[key];
+    saveUserStats();
+    computeResults();
+  }
 }
 
 function clearCurrentEmblems() {
@@ -2080,7 +2183,141 @@ function tierWeightFor(statName, role) {
   return tierWeights[Math.min(t, tierWeights.length - 1)] || 1;
 }
 
+// DPS 공식 파라미터 (2026-05-10 raw-sum 모델)
+const DEALER_BETA = 1.09; // sum_raw power
+const DEALER_DEF_DEFAULT = 9000; // 허수아비 기준 적정 관통 (final 단위)
+// Stat 가중치 (raw 1점당 sumRaw 기여도).
+// 2026-05-10 측정 fit: 사용자 3 configs × 5 trials (20260510.txt) 기반.
+//   공격 0.7: B/A 측정에서 raw 공격 +420 → +0.47% DPS만 (모델 weight 1.0이면 +1.73% 예측). 과대평가 보정.
+//   치명 1.1: 사용자 게임 경험 (긴 쿨 강타 치명 의존도) + 측정과 모순 없음.
+//   관통 0.7: A→C 측정에서 관통 substitution 손실 -1.26%, weight 0.7과 일치. cap 초과는 자동 0.
+const ATTACK_RAW_WEIGHT = 0.70;
+const CRIT_RAW_WEIGHT = 1.10;
+const PIERCE_RAW_WEIGHT = 0.70;
+const HIT_RAW_WEIGHT = 1.00;
+
+function getDealerDef() {
+  if (typeof userStats.dealerMobDef === 'number' && isFinite(userStats.dealerMobDef) && userStats.dealerMobDef >= 0) {
+    return userStats.dealerMobDef;
+  }
+  return DEALER_DEF_DEFAULT;
+}
+function setDealerDef(v) {
+  const n = parseFloat(v);
+  userStats.dealerMobDef = isFinite(n) && n >= 0 ? n : DEALER_DEF_DEFAULT;
+  saveUserStats();
+}
+
+// 보석/엠블 추천 정책
+//   'dps'           : 모든 슬롯에서 dealerStatGain 최대 → 보석=공격/치명, 엠블=관통(+명중) 경향
+//   'pierce_hit_gem': 보석에 관통/명중 cap까지 우선 채우고 → 엠블이 자연스럽게 공격/치명로 채워짐
+//                    (엠블 교체비용이 비싸서 선호)
+const DEALER_POLICY_DEFAULT = 'pierce_hit_gem';
+function getDealerPolicy() {
+  const v = userStats.dealerPolicy;
+  return (v === 'dps' || v === 'pierce_hit_gem') ? v : DEALER_POLICY_DEFAULT;
+}
+function setDealerPolicy(v) {
+  if (v === 'dps' || v === 'pierce_hit_gem') {
+    userStats.dealerPolicy = v;
+    saveUserStats();
+  }
+}
+
+// 현재 baseline의 sum_raw 계산 (raw-sum 모델용, pierce 가중치 적용)
+//   - 공격/치명: weight 1.0
+//   - 관통: cap 안에선 PIERCE_RAW_WEIGHT (≈0.7) — 사용자 측정 기반
+//   - 관통 cap 초과: 0
+//   - 명중: target 설정 시 target까지만 sum에 포함, 초과 0
+function dealerCurrentSumRaw() {
+  const def = getDealerDef();
+  const Htarget = (userStats.targets && userStats.targets.명중) || 0;
+  const A = userStats.pairs.공격.final || 0;
+  const C = userStats.pairs.치명.final || 0;
+  const P = userStats.pairs.관통.final || 0;
+  const H = userStats.pairs.명중.final || 0;
+  const bA = userStats.pairs.공격.bonusPct || 100;
+  const bC = userStats.pairs.치명.bonusPct || 100;
+  const bP = userStats.pairs.관통.bonusPct || 100;
+  const bH = userStats.pairs.명중.bonusPct || 100;
+  const Pcap = Math.min(P, def);
+  const Hcap = Htarget > 0 ? Math.min(H, Htarget) : 0;
+  return ATTACK_RAW_WEIGHT * A / (bA / 100)
+       + CRIT_RAW_WEIGHT * C / (bC / 100)
+       + PIERCE_RAW_WEIGHT * Pcap / (bP / 100)
+       + HIT_RAW_WEIGHT * Hcap / (bH / 100);
+}
+
+// 딜러 stat 1개의 ΔDPS/DPS 기여도 (raw-sum 모델, 2026-05-10)
+//
+// 분류:
+//   - 피해보너스: multiplicative, v/(100+D)
+//   - DPS stat (공격/치명/관통/명중) 또는 그 보너스: raw-equiv으로 환산 후 sum_raw에 기여
+//       (보너스% 엠블의 raw equivalent = 그 stat의 raw_base × v/100)
+//   - 방어 계열 stat 및 보너스 (HP/방어/회피/치명저항/HP보너스/방어보너스/회피보너스/치명저항보너스): 0
+//   - 피해감소: 0
+function dealerStatGain(statName, valueStr) {
+  const v = parseFloat(String(valueStr).replace(/[^0-9.\-]/g, ''));
+  if (!isFinite(v) || v === 0) return 0;
+  const cat = categoryOf(statName);
+
+  if (cat === '피해보너스') {
+    const cur = userStats.extras.피해보너스 || 0;
+    return v / (100 + cur);
+  }
+  if (cat === '피해감소') return 0;
+
+  // 방어 계열 (raw 또는 보너스 엠블 모두): DPS 0
+  if (['HP','방어','회피','치명저항'].includes(cat)) return 0;
+
+  const sumRaw = dealerCurrentSumRaw();
+  if (sumRaw <= 0) return 0;
+
+  // 보너스 엠블이면 raw-equivalent으로 환산.
+  // 공격보너스 +Y%pt는 final stat을 rawBase × Y/100 만큼 증가시킴.
+  // 이때 sum_raw에 들어가는 raw 증가량은 그 final 증가량을 (bonusPct/100)으로 나눈 값.
+  // → dRaw = (rawBase × Y/100) / (bonusPct/100) = rawBase × Y / bonusPct
+  const p = userStats.pairs[cat];
+  if (!p) return 0;
+  const isBonus = statName.endsWith('보너스');
+  const rawBase = p.bonusPct > 0 ? p.final / (p.bonusPct / 100) : 0;
+  const dRaw = isBonus ? (p.bonusPct > 0 ? rawBase * v / p.bonusPct : 0) : v;
+
+  if (cat === '공격') {
+    return DEALER_BETA * ATTACK_RAW_WEIGHT * dRaw / sumRaw;
+  }
+  if (cat === '치명') {
+    return DEALER_BETA * CRIT_RAW_WEIGHT * dRaw / sumRaw;
+  }
+  if (cat === '관통') {
+    const def = getDealerDef();
+    if (p.final >= def) return 0;
+    const headroomRaw = (def - p.final) / (p.bonusPct / 100);
+    const dRawCapped = Math.min(dRaw, headroomRaw);
+    const baseGain = DEALER_BETA * PIERCE_RAW_WEIGHT * dRawCapped / sumRaw;
+    return baseGain + (dRawCapped > 0 ? 1e-6 : 0);
+  }
+  if (cat === '명중') {
+    const target = (userStats.targets && userStats.targets.명중) || 0;
+    if (target <= 0) return 0;
+    if (p.final >= target) return 0;
+    const headroomRaw = (target - p.final) / (p.bonusPct / 100);
+    const dRawCapped = Math.min(dRaw, headroomRaw);
+    const baseGain = DEALER_BETA * HIT_RAW_WEIGHT * dRawCapped / sumRaw;
+    return baseGain + (dRawCapped > 0 ? 1e-6 : 0);
+  }
+  return 0;
+}
+
+function dealerEmblemScore(e, effective) {
+  const g1 = dealerStatGain(e.s1, effective.v1);
+  const g2 = dealerStatGain(e.s2, effective.v2);
+  const total = g1 + g2; // 예측 ΔDPS / DPS (대략)
+  return { tier: 0, mag: total, total: total * 10000 };
+}
+
 function emblemScore(e, effective, role) {
+  if (role === '딜러') return dealerEmblemScore(e, effective);
   const w1 = tierWeightFor(e.s1, role);
   const w2 = tierWeightFor(e.s2, role);
   const r1 = relativeImprovement(e.s1, effective.v1);
@@ -2090,7 +2327,16 @@ function emblemScore(e, effective, role) {
   return { tier: tierSum, mag: magSum, total: tierSum + magSum * 100 };
 }
 
+// 딜러: computeResults 시점에 12슬롯 누적해서 한번에 픽한 결과 캐시.
+// 같은 그룹에 대해 selectOptimal이 여러 번 호출되더라도 일관된 결과 반환.
+let DEALER_PICKS_CACHE = null;
+
 function selectOptimal(groupEmblems, role, slots = 4) {
+  if (role === '딜러' && DEALER_PICKS_CACHE) {
+    for (const gName of ['기교','지혜','활력']) {
+      if (emblems[gName] === groupEmblems) return DEALER_PICKS_CACHE[gName] || [];
+    }
+  }
   const candidates = [];
   for (const e of groupEmblems) {
     const eff = emblemAtGrade(e);
@@ -2117,6 +2363,384 @@ function selectOptimal(groupEmblems, role, slots = 4) {
     else map.set(p.emblem.name, { emblem: p.emblem, effective: p.effective, count: 1, sc: p.sc });
   }
   return Array.from(map.values()).sort((a, b) => b.sc.total - a.sc.total);
+}
+
+// 딜러용 통합 픽:
+//   1) 현재 보석 effect 제거 (보석 변경 비용 0이라 가정)
+//   2) 최적 보석 10 슬롯 iterative 픽 → baseline 적용
+//   3) 위 baseline에서 엠블 12 슬롯 iterative 픽
+// 이렇게 해야 "보석으로 cap·sum 채우고 남은 부분만 엠블로" 추천됨.
+let DEALER_GEM_PICKS = null;
+
+function computeDealerPicksAllGroups() {
+  const savedPairs = userStats.pairs;
+  const savedExtras = userStats.extras;
+  userStats.pairs = JSON.parse(JSON.stringify(savedPairs));
+  userStats.extras = JSON.parse(JSON.stringify(savedExtras));
+
+  // Step 1: 현재 장착 보석의 final 효과를 baseline에서 제거 (비용 0이므로 자유 교체 가정)
+  for (const piece of GEM_PIECES) {
+    const slots = userStats.gems[piece] || ['',''];
+    for (const stat of slots) {
+      if (!stat) continue;
+      const p = userStats.pairs[stat];
+      if (p) p.final = Math.max(0, p.final - GEM_VALUE * (p.bonusPct / 100));
+    }
+  }
+
+  // Step 1.5: 보석 stripped 후 스냅샷 — 보석 2-swap 평가 시 매번 여기서 재시작
+  const noGemSnap = {
+    pairs: JSON.parse(JSON.stringify(userStats.pairs)),
+    extras: JSON.parse(JSON.stringify(userStats.extras)),
+  };
+
+  // Step 2: 최적 보석 10 슬롯 iterative 픽 + 즉시 baseline 적용
+  const policy = getDealerPolicy();
+  const gemPicks = {};
+  for (const piece of GEM_PIECES) gemPicks[piece] = ['',''];
+  for (const piece of GEM_PIECES) {
+    const opts = GEM_OPTIONS[piece];
+    for (let i = 0; i < 2; i++) {
+      let best = '', bestG = 0;
+      // 정책 'pierce_hit_gem': 관통/명중 cap 안이면 우선 픽 (엠블에 공격/치명 양보)
+      if (policy === 'pierce_hit_gem') {
+        for (const stat of opts) {
+          if (stat !== '관통' && stat !== '명중') continue;
+          const g = dealerStatGain(stat, GEM_VALUE);
+          if (g > bestG) { bestG = g; best = stat; }
+        }
+      }
+      // fallback: 일반 dealerStatGain max (정책 'dps' 기본 동작 / 관통·명중 cap 다 찼을 때)
+      if (!best) {
+        for (const stat of opts) {
+          const g = dealerStatGain(stat, GEM_VALUE);
+          if (g > bestG) { bestG = g; best = stat; }
+        }
+      }
+      gemPicks[piece][i] = best;
+      if (best) {
+        const p = userStats.pairs[best];
+        if (p) p.final += GEM_VALUE * (p.bonusPct / 100);
+      }
+    }
+  }
+  DEALER_GEM_PICKS = gemPicks;
+
+  // Step 3: 현재 엠블럼 strip — 단 target == current인 stat에 기여하는 엠블럼은 보존
+  // 사용된 preserved 셋과 strip된 non-preserved 엠블 리스트도 캐시 (보석 2-swap 재평가 시 재사용)
+  const cachedPreserved = getPreservedStats();
+  const strippedCurrentEmblems = []; // [{groupName, emblem, eff}, ...] — 매 eval에서 다시 strip할 엠블들
+  const reservedEmblems = { 기교: [], 지혜: [], 활력: [] };
+  for (const groupName of ['기교','지혜','활력']) {
+    const list = (userStats.currentEmblems[groupName] || []).filter(x => x);
+    for (const val of list) {
+      const [name, gradeStr] = val.includes('#') ? val.split('#') : [val, ''];
+      const grade = parseInt(gradeStr) || 0;
+      const emblem = (emblems[groupName] || []).find(e => e.name === name);
+      if (!emblem) continue;
+      const eff = grade > 0 ? emblem.grades[grade - 1] : null;
+      if (!eff) continue;
+      if (cachedPreserved.size > 0 && emblemContributesToPreserved(emblem, cachedPreserved)) {
+        const effWithGrade = { ...eff, grade };
+        reservedEmblems[groupName].push({
+          emblem, effective: effWithGrade, count: 1,
+          sc: { tier: 0, mag: 0, total: 0 },
+          _isPreserved: true,
+        });
+      } else {
+        applyEmblemToCurrent(emblem, eff, -1); // strip
+        strippedCurrentEmblems.push({ groupName, emblem, eff });
+      }
+    }
+  }
+
+  // Step 4: greedy 픽 (활력 → 기교 → 지혜). 각 그룹의 flat list 캡처.
+  const flatPicks = { 활력: [], 기교: [], 지혜: [] };
+  for (const groupName of ['활력','기교','지혜']) {
+    const reserved = reservedEmblems[groupName] || [];
+    for (const r of reserved) {
+      for (let i = 0; i < r.count; i++) {
+        flatPicks[groupName].push({
+          emblem: r.emblem, effective: r.effective,
+          lowCeiling: false, isReserved: true,
+        });
+      }
+    }
+    const remainingSlots = Math.max(0, 4 - flatPicks[groupName].length);
+    if (remainingSlots > 0) {
+      const newFlat = pickDealerGroupFlat(emblems[groupName], remainingSlots);
+      for (const p of newFlat) {
+        flatPicks[groupName].push({ ...p, isReserved: false });
+      }
+    }
+  }
+
+  // Step 5: 2-swap 로컬 서치 (보석 + 엠블).
+  // 매 eval은 noGemSnap에서 시작 → gemPicks 적용 → strippedCurrentEmblems 다시 strip → flatPicks 적용 → DPS 계산
+  const evalDPSFromAll = () => {
+    userStats.pairs = JSON.parse(JSON.stringify(noGemSnap.pairs));
+    userStats.extras = JSON.parse(JSON.stringify(noGemSnap.extras));
+    // 1) 현재 gemPicks 적용
+    for (const piece of GEM_PIECES) {
+      for (const stat of (gemPicks[piece] || ['',''])) {
+        if (!stat) continue;
+        const p = userStats.pairs[stat];
+        if (p) p.final += GEM_VALUE * (p.bonusPct / 100);
+      }
+    }
+    // 2) 비보존 current 엠블 strip (Step 3과 동일)
+    for (const s of strippedCurrentEmblems) {
+      applyEmblemToCurrent(s.emblem, s.eff, -1);
+    }
+    // 3) 비reserved emblem picks 적용
+    for (const g of ['활력','기교','지혜']) {
+      for (const p of flatPicks[g]) {
+        if (p.isReserved) continue;
+        applyEmblemToCurrent(p.emblem, p.effective, +1);
+      }
+    }
+    const sumRaw = dealerCurrentSumRaw();
+    const D = userStats.extras.피해보너스 || 0;
+    return Math.pow(sumRaw, DEALER_BETA) * (1 + D / 100);
+  };
+
+  let curDPS = evalDPSFromAll();
+  const MAX_ITER = 12;
+  for (let iter = 0; iter < MAX_ITER; iter++) {
+    let improved = false;
+
+    // === 엠블 swap ===
+    for (const groupName of ['활력','기교','지혜']) {
+      const buildPool = () => {
+        const usage = new Map();
+        for (const p of flatPicks[groupName]) {
+          usage.set(p.emblem.name, (usage.get(p.emblem.name) || 0) + 1);
+        }
+        const pool = [];
+        for (const e of emblems[groupName]) {
+          const eff = emblemAtGrade(e);
+          if (!eff) continue;
+          const max = e.unique ? 1 : 2;
+          const partialExc = partialExcludedCount(e.name, eff.grade);
+          const effectiveMax = max - partialExc;
+          if (effectiveMax <= 0) continue;
+          const lowCeiling = maxAvailableGrade(e) < 4;
+          const remain = effectiveMax - (usage.get(e.name) || 0);
+          for (let i = 0; i < remain; i++) pool.push({ emblem: e, effective: eff, lowCeiling });
+        }
+        return pool;
+      };
+      let pool = buildPool();
+
+      for (let i = 0; i < flatPicks[groupName].length; i++) {
+        if (flatPicks[groupName][i].isReserved) continue;
+        let bestSwapIdx = -1;
+        let bestSwapDPS = curDPS;
+        const orig = flatPicks[groupName][i];
+        for (let j = 0; j < pool.length; j++) {
+          const c = pool[j];
+          flatPicks[groupName][i] = {
+            emblem: c.emblem, effective: c.effective,
+            lowCeiling: c.lowCeiling, isReserved: false,
+          };
+          const newDPS = evalDPSFromAll();
+          if (newDPS > bestSwapDPS + 1e-9) {
+            bestSwapIdx = j;
+            bestSwapDPS = newDPS;
+          }
+        }
+        if (bestSwapIdx >= 0) {
+          const c = pool[bestSwapIdx];
+          flatPicks[groupName][i] = {
+            emblem: c.emblem, effective: c.effective,
+            lowCeiling: c.lowCeiling, isReserved: false,
+          };
+          curDPS = bestSwapDPS;
+          improved = true;
+          pool = buildPool();
+        } else {
+          flatPicks[groupName][i] = orig;
+        }
+      }
+    }
+
+    // 보석은 정책에 따라 초기 픽으로 고정 (사용자 비용 절감 의도).
+    // 2-swap에서 보석 stat 변경 안 함 — 엠블 swap만 수행.
+
+    if (!improved) break;
+  }
+  // 최종 state를 picks 적용 상태로
+  evalDPSFromAll();
+  DEALER_GEM_PICKS = gemPicks;
+
+  // 결과: flatPicks → count-aggregated map per group
+  const result = {};
+  for (const groupName of ['활력','기교','지혜']) {
+    const map = new Map();
+    for (const p of flatPicks[groupName]) {
+      if (map.has(p.emblem.name)) map.get(p.emblem.name).count++;
+      else map.set(p.emblem.name, {
+        emblem: p.emblem, effective: p.effective, count: 1,
+        sc: { tier: 0, mag: 0, total: 0 },
+        _isPreserved: p.isReserved,
+      });
+    }
+    result[groupName] = Array.from(map.values()).sort((a, b) => b.count - a.count);
+  }
+
+  // restore
+  userStats.pairs = savedPairs;
+  userStats.extras = savedExtras;
+  return result;
+}
+
+// 그리디 픽: flat 리스트 반환 (2-swap용). 각 픽은 baseline에 즉시 적용.
+function pickDealerGroupFlat(groupEmblems, slots) {
+  const pool = [];
+  for (const e of groupEmblems) {
+    const eff = emblemAtGrade(e);
+    if (!eff) continue;
+    const max = e.unique ? 1 : 2;
+    const partialExc = partialExcludedCount(e.name, eff.grade);
+    const remain = max - partialExc;
+    if (remain <= 0) continue;
+    const lowCeiling = maxAvailableGrade(e) < 4;
+    for (let i = 0; i < remain; i++) pool.push({ emblem: e, effective: eff, lowCeiling, used: false });
+  }
+  const picked = [];
+  for (let s = 0; s < slots; s++) {
+    let best = null, bestScore = -Infinity;
+    for (const c of pool) {
+      if (c.used) continue;
+      const sc = dealerEmblemScore(c.emblem, c.effective);
+      const score = (c.lowCeiling ? -1e9 : 0) + sc.mag;
+      if (score > bestScore) { bestScore = score; best = c; }
+    }
+    if (!best) break;
+    best.used = true;
+    picked.push({ emblem: best.emblem, effective: best.effective, lowCeiling: best.lowCeiling });
+    applyEmblemToCurrent(best.emblem, best.effective);
+  }
+  return picked;
+}
+
+function pickDealerGroup(groupEmblems, slots) {
+  const flat = pickDealerGroupFlat(groupEmblems, slots);
+  const map = new Map();
+  for (const p of flat) {
+    if (map.has(p.emblem.name)) map.get(p.emblem.name).count++;
+    else map.set(p.emblem.name, {
+      emblem: p.emblem, effective: p.effective, count: 1,
+      sc: { tier: 0, mag: 0, total: 0 },
+    });
+  }
+  return Array.from(map.values()).sort((a, b) => b.count - a.count);
+}
+
+// 픽한 엠블럼 1개의 stat 효과를 현재 userStats(임시 baseline)에 가감 — 다음 픽 평가용
+// sign: +1 (apply 추가) / -1 (strip 제거)
+//
+// 관통은 dealer mode에서 def cap 적용 (over-cap 방지).
+// 명중은 dealer mode에서 target cap 적용.
+function applyEmblemToCurrent(emblem, eff, sign = 1) {
+  const isDealer = currentRole === '딜러';
+  const pierceDef = isDealer ? getDealerDef() : Infinity;
+  const hitTarget = isDealer ? ((userStats.targets && userStats.targets.명중) || 0) : 0;
+
+  const capFinalFor = (statName) => {
+    if (!isDealer) return Infinity;
+    if (statName === '관통' || statName === '관통보너스') return pierceDef;
+    if ((statName === '명중' || statName === '명중보너스') && hitTarget > 0) return hitTarget;
+    return Infinity;
+  };
+
+  for (const k of [1, 2]) {
+    const sn = emblem['s' + k];
+    const vRaw = parseFloat(String(eff['v' + k]).replace(/[^0-9.\-]/g, '')) || 0;
+    const v = vRaw * sign;
+    if (sn === '피해보너스') {
+      userStats.extras.피해보너스 = Math.max(0, (userStats.extras.피해보너스 || 0) + v);
+    } else if (sn === '피해감소') {
+      userStats.extras.피해감소 = Math.max(0, (userStats.extras.피해감소 || 0) + v);
+    } else if (sn.endsWith('보너스')) {
+      const key = sn.replace(/보너스$/, '');
+      const p = userStats.pairs[key];
+      if (p && p.bonusPct > 0) {
+        const cap = capFinalFor(sn);
+        const headroom = cap - p.final;
+        const dFinal = (p.final / (p.bonusPct / 100)) * v / 100;
+        // sign=+1: headroom 양수일 때만 가감 (cap 도달 시 0); sign=-1: 항상 적용 (strip)
+        const dCapped = sign > 0 ? Math.min(Math.max(0, dFinal), Math.max(0, headroom)) : dFinal;
+        p.final = Math.max(0, p.final + dCapped);
+      }
+    } else {
+      const p = userStats.pairs[sn];
+      if (p) {
+        const cap = capFinalFor(sn);
+        const headroom = cap - p.final;
+        const dFinal = v * (p.bonusPct / 100);
+        const dCapped = sign > 0 ? Math.min(Math.max(0, dFinal), Math.max(0, headroom)) : dFinal;
+        p.final = Math.max(0, p.final + dCapped);
+      }
+    }
+  }
+}
+
+// target과 현재 stat이 동일 (또는 거의 동일)한 stat 목록 — 이런 stat은 "건드리지 않음"
+function getPreservedStats() {
+  const preserved = new Set();
+  const t = userStats.targets || {};
+  const epsilon = 1; // 절대값 차이 허용 오차
+  for (const cat of ['명중','관통','방어','치명저항','회피']) {
+    const target = t[cat] || 0;
+    if (target <= 0) continue;
+    const cur = (userStats.pairs[cat] && userStats.pairs[cat].final) || 0;
+    if (Math.abs(cur - target) < epsilon) preserved.add(cat);
+  }
+  // 치명확률 / 피해보너스 / 피해감소: 별도 처리 (raw stat 아니므로 emblem preserve 매핑 어려움)
+  return preserved;
+}
+
+// emblem이 preserved stat에 기여하는지 (s1 또는 s2가 preserved stat 또는 그 보너스)
+function emblemContributesToPreserved(emblem, preservedSet) {
+  for (const k of [1, 2]) {
+    const sn = emblem['s' + k];
+    if (!sn) continue;
+    const cat = categoryOf(sn);
+    if (preservedSet.has(cat)) return true;
+  }
+  return false;
+}
+
+// 현재 장착 엠블럼 strip — 단 preserved stat에 기여하는 엠블럼은 보존 (반환)
+// 반환: { 기교: [reserved emblem entries], 지혜: [...], 활력: [...] }
+function stripCurrentEmblemsWithPreserve() {
+  const preserved = getPreservedStats();
+  const reserved = { 기교: [], 지혜: [], 활력: [] };
+  for (const groupName of ['기교','지혜','활력']) {
+    const list = (userStats.currentEmblems[groupName] || []).filter(x => x);
+    for (const val of list) {
+      const [name, gradeStr] = val.includes('#') ? val.split('#') : [val, ''];
+      const grade = parseInt(gradeStr) || 0;
+      const emblem = (emblems[groupName] || []).find(e => e.name === name);
+      if (!emblem) continue;
+      const eff = grade > 0 ? emblem.grades[grade - 1] : null;
+      if (!eff) continue;
+      if (preserved.size > 0 && emblemContributesToPreserved(emblem, preserved)) {
+        // 보존 — strip 안 함, 결과에 자동 포함
+        // emblem.grades[i]는 {v1, v2}만 가지고 grade 필드가 없으므로 보강
+        const effWithGrade = { ...eff, grade };
+        reserved[groupName].push({
+          emblem, effective: effWithGrade, count: 1,
+          sc: { tier: 0, mag: 0, total: 0 },
+          _isPreserved: true,
+        });
+      } else {
+        applyEmblemToCurrent(emblem, eff, -1);
+      }
+    }
+  }
+  return reserved;
 }
 
 function setStatRank(role, stat, value) {
@@ -2148,6 +2772,63 @@ let currentRole = '탱커';
 
 function renderAuthorNotes() {
   const root = document.getElementById('author-notes');
+  if (currentRole === '딜러') {
+    const def = getDealerDef();
+    const policy = getDealerPolicy();
+    root.innerHTML = `
+      <div class="note-title" style="color:#ffe07a;">⚡ 딜러는 DPS 공식 기반 자동 점수 (2026-05-09)</div>
+      <div style="margin:8px 0 12px; padding:10px 12px; background:rgba(255,215,0,0.08); border:1px solid rgba(255,215,0,0.3); border-radius:6px;">
+        <label style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <span style="color:#ffe07a; font-weight:bold;">🎯 몬스터 예측 방어:</span>
+          <input id="dealer-mob-def" type="number" value="${def}" min="0" step="100"
+                 style="width:100px; padding:5px 8px; background:#1a1a2e; color:#fff; border:1px solid #555; border-radius:4px;">
+          <button onclick="setDealerDef(${DEALER_DEF_DEFAULT}); renderAll();"
+                  style="padding:4px 10px; background:#444; color:#ddd; border:1px solid #666; border-radius:4px; font-size:12px; cursor:pointer;">기본값(${DEALER_DEF_DEFAULT})</button>
+        </label>
+        <div style="font-size:11px; color:#aaa; margin-top:6px;">
+          허수아비 기준 약 <b>${DEALER_DEF_DEFAULT}</b>. 다른 몬스터/렙대를 타겟팅하면 값을 변경하세요. 관통은 이 값까지만 추천에서 점수 가산.
+        </div>
+      </div>
+      <div style="margin:8px 0 12px; padding:10px 12px; background:rgba(127,255,127,0.06); border:1px solid rgba(127,255,127,0.25); border-radius:6px;">
+        <div style="color:#7fff7f; font-weight:bold; margin-bottom:6px;">⚖️ 보석/엠블 분담 정책</div>
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:4px 0;">
+          <input type="radio" name="dealer-policy" value="pierce_hit_gem" ${policy === 'pierce_hit_gem' ? 'checked' : ''}
+                 onchange="setDealerPolicy('pierce_hit_gem'); renderAll();">
+          <span><b>관통·명중 보석 우선</b> <span style="color:#aaa; font-size:11px;">(엠블 교체비 절약 - 보석으로 cap 채우고 엠블은 공격/치명 위주)</span></span>
+        </label>
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:4px 0;">
+          <input type="radio" name="dealer-policy" value="dps" ${policy === 'dps' ? 'checked' : ''}
+                 onchange="setDealerPolicy('dps'); renderAll();">
+          <span><b>DPS 최대 (이론치)</b> <span style="color:#aaa; font-size:11px;">(보석=공격/치명, 엠블=관통 → 총 DPS 동일하지만 엠블 교체비 큼)</span></span>
+        </label>
+        <div style="font-size:11px; color:#888; margin-top:6px; line-height:1.5;">
+          두 정책의 <b>총 DPS는 거의 동일</b>합니다. 단지 같은 raw 값을 보석/엠블 어느 쪽에 배치하느냐의 차이입니다.
+          엠블 교체비가 비싸므로 cap 있는 stat(관통/명중)을 보석에 몰아주는 것이 비용 효율적.
+        </div>
+      </div>
+      <div style="font-size:13px; line-height:1.7; color:#ddd;">
+        딜러 추천은 우선순위 티어가 아니라 <b>raw-sum DPS 공식</b>으로 계산됩니다 (중국 서버 컨센서스 + 측정 검증):<br>
+        <code style="color:#a0e0ff;">DPS ∝ sum_raw<sup>1.09</sup> × (1 + D%)</code>,
+        sum_raw = 공격_raw + 치명_raw + min(관통, ${def})_raw<br><br>
+        엠블럼 1개당 <b>예측 ΔDPS%</b>를 직접 계산해서 정렬합니다. 따라서:
+        <ul style="margin:6px 0 6px 20px; padding:0;">
+          <li><b>피해보너스</b>: 항상 최강 (multiplicative)</li>
+          <li><b>관통</b>: ${def}까지만 효율, 초과분 0</li>
+          <li><b>명중</b>: 목표값까지만 효율 (관통과 동일한 cap), 초과분 0</li>
+          <li><b>공격 raw</b>: 1점당 효율 <b>0.70</b> (2026-05-10 측정 fit — B/A 비교에서 raw 공격 효과 작게 측정)</li>
+          <li><b>치명 raw</b>: 1점당 효율 <b>1.10</b> (사용자 게임 경험 — 긴 쿨다운 강타가 치명 의존도 높음)</li>
+          <li><b>관통 raw (cap 안)</b>: 1점당 효율 <b>0.70</b> (cap 초과시 0)</li>
+          <li><b>명중 raw (target 안)</b>: 1점당 효율 1.0 (기준)</li>
+          <li><b>공격보너스 / 치명보너스 / 관통보너스 / 명중보너스</b>: raw-equivalent (raw_base × v / 보너스%) 환산해 기여</li>
+          <li><b>방어보너스 / HP보너스 / 회피보너스 / 치명저항보너스</b>: DPS 0</li>
+          <li>HP / 방어 / 회피 / 치명저항 / 피해감소: DPS 0</li>
+          <li><b>🔒 stat 보존</b>: 목표값 == 현재값인 stat은 그 stat에 기여하는 현재 엠블럼을 그대로 유지 (재배치 안 함)</li>
+        </ul>
+      </div>`;
+    const inp = document.getElementById('dealer-mob-def');
+    if (inp) inp.addEventListener('change', () => { setDealerDef(inp.value); renderAll(); });
+    return;
+  }
   const tiers = authorNotes[currentRole];
   const rows = tiers.map((stats, i) =>
     `<div class="note-row"><span class="note-rank">${i + 1}위</span><span class="note-stats">${stats.join(', ')}</span></div>`
@@ -2160,8 +2841,10 @@ function renderAuthorNotes() {
 
 function renderTierEditor() {
   const root = document.getElementById('tier-editor');
+  if (!root) return;
   root.innerHTML = '';
-  document.getElementById('priority-role-label').textContent = currentRole;
+  const lbl = document.getElementById('priority-role-label');
+  if (lbl) lbl.textContent = currentRole;
   const tiers = priorityTiers[currentRole];
   const etc = ALL_STATS.filter(s => findTier(currentRole, s) < 0);
 
@@ -2284,15 +2967,23 @@ function makeSingleRow(label, value, suffix, onChange, opts = {}) {
 }
 
 function renderStatsPanel() {
+  const ratingDisclaimer = () => {
+    const note = document.createElement('div');
+    note.style.cssText = 'font-size:11px; color:#999; padding:4px 6px 8px; line-height:1.5;';
+    note.textContent = '※ 스탯 합산으로 결정되는 공격평점과 방어평점은 시스템이 가지고 있는 소수점 아래 2자리값을 알 수 없어 약간의 오차가 발생할 수 있습니다.';
+    return note;
+  };
   const offenseEl = document.getElementById('offense-grid');
   offenseEl.innerHTML = '';
   offenseEl.appendChild(makeRatingRow('공격평점', computeAttackRating(),
     '= (공격 + 치명 + 명중 + 관통) × (1 + 피해보너스% / 100)'));
+  offenseEl.appendChild(ratingDisclaimer());
   OFFENSE_PAIRS.forEach(k => offenseEl.appendChild(makePairRow(k)));
   const defenseEl = document.getElementById('defense-grid');
   defenseEl.innerHTML = '';
   defenseEl.appendChild(makeRatingRow('방어평점', computeDefenseRating(),
     '= (HP/430 + 방어 + 회피 + 치명저항) × (1 + 피해감소% / 100)'));
+  defenseEl.appendChild(ratingDisclaimer());
   DEFENSE_PAIRS.forEach(k => defenseEl.appendChild(makePairRow(k)));
 
   const dmgEl = document.getElementById('damage-grid');
@@ -2424,6 +3115,10 @@ function renderGroups() {
       const thumb = imgSrc ? `<div class="emblem-thumb" style="background-image:url('${imgSrc}')"></div>` : '';
       const safeName = p.emblem.name.replace(/'/g, "\\'");
       const excludeBtn = `<button class="exclude-btn" onclick="excludeGrade('${safeName}', ${p.effective.grade})" title="이 급수를 만들 수 없을 때">🚫 ${p.effective.grade}급 제외</button>`;
+      // non-unique 엠블 + 추천 count > 1 일 때만 "1개 제외" 버튼 노출
+      const excludeOneBtn = (!p.emblem.unique && p.count > 1)
+        ? `<button class="exclude-btn" onclick="excludeOne('${safeName}', ${p.effective.grade})" title="2개 중 1개만 보유 시" style="margin-left:4px;">🚫 1개 제외</button>`
+        : '';
       return `
         <div class="emblem-card${p.emblem.unique ? ' unique' : ''}">
           ${thumb}
@@ -2442,7 +3137,7 @@ function renderGroups() {
                 <span><span class="stat-value">${p.effective.v2}</span> <span class="stat-eff">${eff2}</span></span>
               </div>
             </div>
-            ${excludeBtn}
+            ${excludeBtn}${excludeOneBtn}
           </div>
         </div>`;
     }).join('');
@@ -2647,12 +3342,67 @@ function clearStale() {
 }
 
 function computeResults() {
+  // 딜러: 12 슬롯 누적 픽 (관통 cap 등 cross-group 효과 반영) → 캐시
+  if (currentRole === '딜러') {
+    DEALER_PICKS_CACHE = computeDealerPicksAllGroups();
+  } else {
+    DEALER_PICKS_CACHE = null;
+  }
   renderGroups();
+  renderGemRecommendation();
   renderFinalSummary();
   renderRatingRanking();
   renderAllList();
   renderExclusionBar();
   clearStale();
+}
+
+// 딜러 보석 추천 — computeDealerPicksAllGroups에서 캐시된 결과 사용
+function renderGemRecommendation() {
+  const el = document.getElementById('gem-rec');
+  if (!el) return;
+  if (currentRole !== '딜러') { el.innerHTML = ''; return; }
+  if (!DEALER_GEM_PICKS) { el.innerHTML = ''; return; }
+
+  const recPerSlot = DEALER_GEM_PICKS;
+
+  // 현재 보석 vs 추천 비교 렌더
+  const rows = [];
+  for (const piece of GEM_PIECES) {
+    const slots = userStats.gems[piece] || ['',''];
+    const rec = recPerSlot[piece];
+    const slotInfo = slots.map((s, i) => {
+      const r = rec[i] || '';
+      const empty = !s;
+      const same = s === r;
+      const cur = empty ? '<span style="color:#777;">미장착</span>' : s;
+      let tag;
+      if (empty && r) tag = ` <span style="color:#ffa050;">→ ${r} 추가</span>`;
+      else if (empty && !r) tag = ' <span style="color:#777;">(추천 없음)</span>';
+      else if (same) tag = ' <span style="color:#7fff7f;">✓</span>';
+      else if (!r) tag = ` <span style="color:#aaa;">→ 효과 없음</span>`;
+      else tag = ` <span style="color:#ffd070;">→ ${r}로 교체</span>`;
+      return `<div style="font-size:12px;">슬롯${i+1}: ${cur}${tag}</div>`;
+    });
+    const recDisp = rec.filter(x => x);
+    const recText = recDisp.length === 0 ? '<span style="color:#777;">없음</span>'
+                  : (recDisp[0] === recDisp[1] || recDisp.length === 1) ? `<b style="color:#7fff7f;">${recDisp[0]}</b>`
+                  : `<b style="color:#7fff7f;">${rec[0]} / ${rec[1]}</b>`;
+    rows.push(`
+      <div style="padding:10px 12px; background:rgba(0,0,0,0.2); border:1px solid #2a2a3e; border-radius:8px;">
+        <div style="font-size:13px; margin-bottom:6px;">
+          <b style="color:#ffd070;">${piece}</b> &nbsp;·&nbsp; 추천 ${recText}
+        </div>
+        <div style="color:#ccc;">${slotInfo.join('')}</div>
+      </div>`);
+  }
+
+  el.innerHTML = `
+    <div class="final-summary-box">
+      <h3>💎 추천 보석 조합 (${GEM_LEVEL_LABEL} 기준)</h3>
+      <div class="hint-line">보석 변경 비용 0 가정 → <b>먼저 보석 최적화</b> 후 그 baseline에서 엠블 추천. 10 슬롯을 순서대로 평가하며 관통 cap 누적 반영.</div>
+      <div style="margin-top:10px; display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px;">${rows.join('')}</div>
+    </div>`;
 }
 
 function renderFinalSummary() {
@@ -2685,6 +3435,21 @@ function renderFinalSummary() {
     addAgg(recAgg, buildContribMap(groupName, recCount));
   }
 
+  // 딜러: 보석 swap 효과도 추천 측에 반영. raw 단위로 추적 (cross term 정확 계산용).
+  const gemRawDelta = {}; // {stat: raw delta from gem swap}
+  if (currentRole === '딜러' && DEALER_GEM_PICKS) {
+    for (const piece of GEM_PIECES) {
+      const cur = userStats.gems[piece] || ['',''];
+      const rec = DEALER_GEM_PICKS[piece] || ['',''];
+      for (let i = 0; i < 2; i++) {
+        const curStat = cur[i], recStat = rec[i];
+        if (curStat === recStat) continue;
+        if (curStat) gemRawDelta[curStat] = (gemRawDelta[curStat] || 0) - GEM_VALUE;
+        if (recStat) gemRawDelta[recStat] = (gemRawDelta[recStat] || 0) + GEM_VALUE;
+      }
+    }
+  }
+
   const cats = new Set([...Object.keys(curAgg), ...Object.keys(recAgg)]);
   const rows = [];
   for (const cat of cats) {
@@ -2705,13 +3470,39 @@ function renderFinalSummary() {
     } else {
       const pair = userStats.pairs[cat];
       if (!pair) continue;
-      const curFin = cur.flat * (pair.bonusPct / 100) + baseOf(cat) * (cur.bonusPct / 100);
-      const recFin = rec.flat * (pair.bonusPct / 100) + baseOf(cat) * (rec.bonusPct / 100);
-      diff = recFin - curFin;
+      // 게임 mechanic: final = rawBase × bonusPct/100. 보너스 엠블은 bonusPct를 증가시킴.
+      // 추천 교체 시: rawBase 변화 = (rec.flat - cur.flat) + gemRawDelta. bonusPct 변화 = (rec.bonusPct - cur.bonusPct).
+      // newFinal = (rawBase + Δraw) × (bonusPct + Δbonus)/100  — cross term 포함 정확 계산.
+      const oldRawBase = baseOf(cat);
+      const rawDelta = (rec.flat - cur.flat) + (gemRawDelta[cat] || 0);
+      const bonusDelta = rec.bonusPct - cur.bonusPct;
+      const newRawBase = oldRawBase + rawDelta;
+      const newBonusPct = pair.bonusPct + bonusDelta;
       currFinal = pair.final;
-      recFinal = pair.final + diff;
+      recFinal = newRawBase * (newBonusPct / 100);
+      diff = recFinal - currFinal;
     }
-    rows.push({ cat, tier, currFinal, recFinal, diff, isPct, sortKey: tierWeightFor(cat, currentRole) });
+    // 딜러 모드: 관통/명중은 cap 초과시 안내. 표시값은 실제 합계 그대로 (인게임 표시와 일치).
+    let capInfo = null;
+    if (currentRole === '딜러' && !isPct) {
+      if (cat === '관통') {
+        const def = getDealerDef();
+        if (recFinal > def) capInfo = { cap: def, label: 'def', overflow: recFinal - def };
+      } else if (cat === '명중') {
+        const target = (userStats.targets && userStats.targets.명중) || 0;
+        if (target > 0 && recFinal > target) capInfo = { cap: target, label: 'target', overflow: recFinal - target };
+      }
+    }
+    // 보너스% 표시용 (raw stat만 해당, 피해보너스/감소는 자체가 %)
+    let curBonus = null, recBonus = null;
+    if (!isPct) {
+      const pair = userStats.pairs[cat];
+      if (pair) {
+        curBonus = pair.bonusPct;
+        recBonus = pair.bonusPct + (rec.bonusPct - cur.bonusPct);
+      }
+    }
+    rows.push({ cat, tier, currFinal, recFinal, diff, isPct, capInfo, curBonus, recBonus, sortKey: tierWeightFor(cat, currentRole) });
   }
   rows.sort((a, b) => b.sortKey - a.sortKey);
 
@@ -2724,12 +3515,19 @@ function renderFinalSummary() {
   const rowsHTML = rows.map(r => {
     const sign = r.diff >= 0 ? '+' : '';
     const cls = Math.abs(r.diff) < 0.05 ? 'same' : (r.diff > 0 ? 'up' : 'down');
+    const capNote = r.capInfo
+      ? ` <span style="color:#ff8a8a; font-size:11px;">(${r.capInfo.label} ${Math.round(r.capInfo.cap).toLocaleString()} 초과: ${Math.round(r.capInfo.overflow).toLocaleString()} 무효)</span>`
+      : '';
+    const curBonusTag = r.curBonus != null
+      ? ` <span style="color:#888; font-size:11px;">(${r.curBonus.toFixed(1)}%)</span>` : '';
+    const recBonusTag = r.recBonus != null
+      ? ` <span style="color:#888; font-size:11px;">(${r.recBonus.toFixed(1)}%)</span>` : '';
     return `
       <div class="final-row">
         <span class="fin-cat"><span class="stat-name tier-${Math.min(r.tier, 9)}">${r.cat}</span></span>
-        <span class="fin-cur">${fmt(r.currFinal, r.isPct)}</span>
+        <span class="fin-cur">${fmt(r.currFinal, r.isPct)}${curBonusTag}</span>
         <span class="fin-arrow">→</span>
-        <span class="fin-rec">${fmt(r.recFinal, r.isPct)}</span>
+        <span class="fin-rec">${fmt(r.recFinal, r.isPct)}${recBonusTag}${capNote}</span>
         <span class="fin-diff ${cls}">${sign}${fmt(r.diff, r.isPct)}</span>
       </div>`;
   }).join('');
@@ -2757,9 +3555,12 @@ function renderFinalSummary() {
   };
   const ratingsHTML = ratingRow('🔥', '공격평점', curAR, newAR) + ratingRow('🛡️', '방어평점', curDR, newDR);
 
-  const hint = anyCurrent
+  const dealerNote = currentRole === '딜러'
+    ? '<br><span style="color:#ffd070;">💎 보석도 추천 조합으로 교체된 상태 가정 (보석 비용 0).</span>'
+    : '';
+  const hint = (anyCurrent
     ? '현재 장착 엠블럼을 추천 조합으로 교체했을 때 예상되는 최종 스탯입니다.'
-    : '⚠️ <b>현재 장착 엠블럼이 입력되지 않음</b> — 추천 조합의 순수 기여량 기준으로만 계산됩니다. 정확한 교체 효과를 보려면 "🛡️ 현재 장착 엠블럼"에 입력해주세요.';
+    : '⚠️ <b>현재 장착 엠블럼이 입력되지 않음</b> — 추천 조합의 순수 기여량 기준으로만 계산됩니다. 정확한 교체 효과를 보려면 "🛡️ 현재 장착 엠블럼"에 입력해주세요.') + dealerNote;
 
   el.innerHTML = `
     <div class="final-summary-box">
@@ -2861,10 +3662,153 @@ function renderRatingRanking() {
 }
 
 function renderEditors() {
+  // 딜러는 우선순위 티어/리셋/안내 숨김 (DPS 공식 기반 자동 점수만 사용)
+  // 단 author-notes 영역은 딜러 설정(몬스터 방어 입력 등)을 표시하므로 유지
+  const priorityPanel = document.getElementById('priority-panel');
+  if (priorityPanel) {
+    const isDealer = currentRole === '딜러';
+    // panel-head 텍스트 갱신: priority-role-label 엘리먼트 보존 (innerHTML 사용)
+    const headSpan = priorityPanel.querySelector('.panel-head > span');
+    if (headSpan) {
+      headSpan.innerHTML = isDealer
+        ? '⚙️ <span id="priority-role-label">딜러</span> 설정 (DPS 공식 기반)'
+        : `⚙️ <span id="priority-role-label">${currentRole}</span> 우선순위 편집`;
+    }
+    const tierEd = document.getElementById('tier-editor');
+    const actionsBar = priorityPanel.querySelector('.panel-actions');
+    const hintDiv = priorityPanel.querySelector('.panel-body > .hint');
+    if (tierEd) tierEd.style.display = isDealer ? 'none' : '';
+    if (actionsBar) actionsBar.style.display = isDealer ? 'none' : '';
+    if (hintDiv) hintDiv.style.display = isDealer ? 'none' : '';
+  }
   renderTierEditor();
   renderAuthorNotes();
   renderStatsPanel();
   renderCurrentEmblemsPanel();
+  renderGemsPanel();
+}
+
+function renderGemsPanel() {
+  const panel = document.getElementById('gems-panel');
+  if (!panel) return;
+  // 딜러일 때만 표시
+  panel.style.display = currentRole === '딜러' ? '' : 'none';
+  if (currentRole !== '딜러') return;
+
+  const grid = document.getElementById('gems-grid');
+  if (!grid) return;
+
+  // 슬롯별 추천: 10 슬롯 iterative 픽 (관통 cap 누적 처리). 임시 baseline에서 픽 후 적용
+  const savedP = userStats.pairs, savedE = userStats.extras;
+  userStats.pairs = JSON.parse(JSON.stringify(savedP));
+  userStats.extras = JSON.parse(JSON.stringify(savedE));
+  const recCache = {};
+  for (const pc of GEM_PIECES) recCache[pc] = ['',''];
+  const policy = getDealerPolicy();
+  for (const pc of GEM_PIECES) {
+    const opts = GEM_OPTIONS[pc];
+    for (let i = 0; i < 2; i++) {
+      let best = '', bestG = 0;
+      if (policy === 'pierce_hit_gem') {
+        for (const stat of opts) {
+          if (stat !== '관통' && stat !== '명중') continue;
+          const g = dealerStatGain(stat, GEM_VALUE);
+          if (g > bestG) { bestG = g; best = stat; }
+        }
+      }
+      if (!best) {
+        for (const stat of opts) {
+          const g = dealerStatGain(stat, GEM_VALUE);
+          if (g > bestG) { bestG = g; best = stat; }
+        }
+      }
+      recCache[pc][i] = best;
+      if (best) {
+        const p = userStats.pairs[best];
+        if (p) p.final += GEM_VALUE * (p.bonusPct / 100);
+      }
+    }
+  }
+  userStats.pairs = savedP;
+  userStats.extras = savedE;
+
+  let html = `<div style="display:grid; grid-template-columns: 80px 160px 160px 130px; gap:8px 12px; align-items:center; font-size:13px; max-width:600px;">
+    <div style="color:#aaa; font-size:11px;">장비</div>
+    <div style="color:#aaa; font-size:11px;">슬롯 1</div>
+    <div style="color:#aaa; font-size:11px;">슬롯 2</div>
+    <div style="color:#aaa; font-size:11px;">추천</div>`;
+
+  for (const piece of GEM_PIECES) {
+    const slots = userStats.gems[piece];
+    const opts = GEM_OPTIONS[piece];
+    const rec = recCache[piece]; // [stat0, stat1]
+    const renderSelect = (idx) => {
+      const cur = slots[idx] || '';
+      const recStat = rec[idx] || '';
+      const optHtml = ['<option value="">-- 미장착 --</option>']
+        .concat(opts.map(o => {
+          const isRec = o === recStat;
+          return `<option value="${o}" ${o === cur ? 'selected' : ''}>${o}${isRec ? ' ⭐' : ''}</option>`;
+        })).join('');
+      return `<select onchange="setGem('${piece}', ${idx}, this.value)" style="padding:4px 8px; background:#1a1a2e; color:#fff; border:1px solid #555; border-radius:4px; width:100%;">${optHtml}</select>`;
+    };
+    const recDispList = rec.filter(x => x);
+    const recDisp = recDispList.length === 0 ? '<span style="color:#777;">없음</span>'
+                  : (rec[0] === rec[1]) ? `<b style="color:#7fff7f;">${rec[0]}</b>`
+                  : `<b style="color:#7fff7f;">${rec[0] || '—'}<br>${rec[1] || '—'}</b>`;
+    html += `
+      <div style="font-weight:bold; color:#ffd070;">${piece}</div>
+      <div>${renderSelect(0)}</div>
+      <div>${renderSelect(1)}</div>
+      <div style="font-size:12px;">${recDisp}</div>`;
+  }
+
+  // 합산 표시
+  const totals = { 공격: 0, 치명: 0, 명중: 0, 관통: 0 };
+  for (const piece of GEM_PIECES) {
+    for (const s of userStats.gems[piece]) {
+      if (s && totals[s] != null) totals[s] += GEM_VALUE;
+    }
+  }
+  const totalLine = Object.entries(totals)
+    .filter(([, v]) => v > 0)
+    .map(([k, v]) => `${k} +${v}`).join(' · ') || '없음';
+  html += `</div>
+    <div style="margin-top:12px; padding:8px 10px; background:rgba(0,0,0,0.3); border-radius:6px; font-size:12px;">
+      <span style="color:#aaa;">현재 장착 보석 raw 합계:</span> <b>${totalLine}</b>
+      <span style="color:#777; font-size:11px;"> (보석급 ${GEM_LEVEL_LABEL} 가정)</span>
+    </div>`;
+  grid.innerHTML = html;
+}
+
+// 보석 1개 분의 final stat 변화량 = 193 × (bonusPct / 100). sign = +1 추가 / -1 제거
+function applyGemDelta(stat, sign) {
+  if (!stat) return;
+  const p = userStats.pairs[stat];
+  if (!p) return;
+  const delta = GEM_VALUE * (p.bonusPct / 100);
+  p.final = Math.max(0, p.final + sign * delta);
+}
+
+function setGem(piece, idx, value) {
+  if (!userStats.gems[piece]) return;
+  const opts = GEM_OPTIONS[piece];
+  const oldStat = userStats.gems[piece][idx] || '';
+  const newStat = opts.includes(value) ? value : '';
+  if (oldStat === newStat) return;
+  // 동기화 규칙:
+  //  '' → X    : 신규 등록 (이미 final stat에 보석 효과 포함되어 있다고 가정) → sync 안 함
+  //  X → Y    : 교체 시뮬 → 이전 보석 effect 제거, 새 보석 effect 추가
+  //  X → ''   : 제거 시뮬 → 이전 보석 effect 제거
+  if (oldStat !== '') {
+    applyGemDelta(oldStat, -1);
+    if (newStat !== '') applyGemDelta(newStat, +1);
+  }
+  userStats.gems[piece][idx] = newStat;
+  saveUserStats();
+  renderStatsPanel();
+  renderGemsPanel();
+  markStale();
 }
 
 // 결과 영역 초기 플레이스홀더
@@ -2879,19 +3823,27 @@ function renderPlaceholders() {
 function renderExclusionBar() {
   const el = document.getElementById('exclusion-bar');
   if (!el) return;
-  if (!userStats.excluded || userStats.excluded.length === 0) { el.innerHTML = ''; return; }
-  const chips = userStats.excluded.map(key => {
+  const partialEntries = Object.entries(userStats.partialExcluded || {}).filter(([, n]) => n > 0);
+  if ((!userStats.excluded || userStats.excluded.length === 0) && partialEntries.length === 0) { el.innerHTML = ''; return; }
+  const fullChips = (userStats.excluded || []).map(key => {
     const [name, grade] = key.split('#');
-    return `<span class="exclusion-chip">${name} <b>${grade}급</b>
+    return `<span class="exclusion-chip">${name} <b>${grade}급</b> <span style="color:#aaa;">전체</span>
       <span class="x" onclick="removeExclusion('${key.replace(/'/g, "\\'")}')" title="제외 해제">✕</span></span>`;
   }).join('');
+  const partialChips = partialEntries.map(([key, n]) => {
+    const [name, grade] = key.split('#');
+    const safeName = name.replace(/'/g, "\\'");
+    return `<span class="exclusion-chip" style="background:rgba(255,160,80,0.15);">${name} <b>${grade}급</b> <span style="color:#ffa050;">${n}개</span>
+      <span class="x" onclick="removePartialExclusion('${safeName}', ${grade})" title="제외 해제">✕</span></span>`;
+  }).join('');
+  const totalCount = (userStats.excluded?.length || 0) + partialEntries.length;
   el.innerHTML = `
     <div class="exclusion-box">
       <div class="exclusion-title">
-        <span>🚫 제외된 급수 (${userStats.excluded.length}개) — 재계산된 추천 조합</span>
+        <span>🚫 제외 (${totalCount}개) — 재계산된 추천 조합</span>
         <button class="btn-small" onclick="clearExclusions()">모두 해제</button>
       </div>
-      <div class="exclusion-chips">${chips}</div>
+      <div class="exclusion-chips">${fullChips}${partialChips}</div>
     </div>`;
 }
 
@@ -4823,19 +5775,22 @@ function resetAllSwaps() {
   updateDpsView();
 }
 
-// 모델 후보
-const TO_MODELS = [
-  { name: '최소 β (β=0.30)', beta: 0.30, k: 0.5, X: 10000, Y: 1e9, color: '#7fff7f' },
-  { name: '중간 (β=0.50)',   beta: 0.50, k: 0.5, X: 8000,  Y: 1e9, color: '#a0e0ff' },
-  { name: '메인 fit (β=0.82)', beta: 0.82, k: 0.5, X: 4659, Y: 5590, color: '#ffd070' },
-  { name: '높은 β (β=1.00)', beta: 1.00, k: 1.0, X: 5000,  Y: 1e9, color: '#ff9090' },
-];
+// 경험 모델 (2026-05-10 raw-sum 적용, 중국 서버 컨센서스 "raw 1:1" 반영):
+//   DPS ∝ sum_raw^β × (1 + D/100)
+//   sum_raw = A_raw + C_raw + P_raw_capped (raw = final / (bonus%/100))
+//   P_raw_capped: P_final이 def 미만이면 그대로, 이상이면 def에서 cap (def는 final 단위)
+//   β = 1.09 (16점 fit, RMS 1.5%)
+// 의미: 공격/치명/관통(under-cap)/명중 모두 raw 1점 = 1점 동일 효율.
+//       per-percent 효율은 stat별로 다름 (bonus% 영향).
+// 허수아비 적정 관통 약 9000. T=0이면 over-pierce로 가정.
+const MODEL_BETA = 1.09;
 
 function getCurrentStats() {
   const get = id => parseFloat((document.getElementById(id)||{}).value || 0) || 0;
   return {
     A: get('bp-atk'), C: get('bp-cri'), P: get('bp-pen'),
     H: get('bp-hit'), D: get('bp-dmg'),
+    T: Math.max(0, get('bp-tdef')),
   };
 }
 
@@ -4872,16 +5827,25 @@ function hasAnySwap() {
   return false;
 }
 
-function toPredict(stats, m) {
-  const A = Math.max(1, stats.A);
+// raw-sum 모델 (pierce weight 적용). bonuses는 {bA, bC, bP} (%), 미제공이면 100% 가정.
+const PIERCE_WEIGHT = 0.70; // 사용자 측정 (2026-05-10): pierce per raw ≈ 70% × crit per raw
+function toPredict(stats, bonuses) {
+  const A = Math.max(0, stats.A);
   const C = Math.max(0, stats.C);
   const P = Math.max(0, stats.P);
-  const H = Math.max(0, stats.H);
   const D = Math.max(0, stats.D);
-  const p = Math.min(1, C / (A + P));
-  const Pterm = 1 + P / m.X;
-  const Hterm = 1 + H / m.Y;
-  return Math.pow(A, m.beta) * Pterm * Hterm * (1 + D/100) * (1 + m.k * p);
+  const T = Math.max(0, stats.T || 0);
+  const b = bonuses || {};
+  const bA = (b.bA && b.bA > 0) ? b.bA : 100;
+  const bC = (b.bC && b.bC > 0) ? b.bC : 100;
+  const bP = (b.bP && b.bP > 0) ? b.bP : 100;
+  // 관통은 final 단위에서 cap → raw로 변환, raw에 weight 적용
+  const P_eff_final = T > 0 ? Math.min(P, T) : P;
+  const A_raw = A / (bA / 100);
+  const C_raw = C / (bC / 100);
+  const P_raw = P_eff_final / (bP / 100);
+  const sumRaw = Math.max(1, A_raw + C_raw + PIERCE_WEIGHT * P_raw);
+  return Math.pow(sumRaw, MODEL_BETA) * (1 + D / 100);
 }
 
 function getSliderRawDelta() {
@@ -4955,10 +5919,14 @@ function updateDpsView() {
   // 현재 빌드 카드
   const curEl = document.getElementById('dps-current');
   if (curEl) {
+    const overP = cur.T > 0 && cur.P > cur.T;
+    const tdefMsg = cur.T > 0
+      ? ` · 대상방어 <b>${cur.T.toLocaleString()}</b>${overP ? ` <span style="color:#ff8a8a;">(관통 ${(cur.P-cur.T).toLocaleString()} 낭비)</span>` : ''}`
+      : '';
     curEl.innerHTML = `<div style="font-size:13px; line-height:1.6;">
       <span style="color:#aaa;">현재 빌드:</span>
       공 <b>${cur.A}</b> · 치 <b>${cur.C}</b> · 관 <b>${cur.P}</b> · 명 <b>${cur.H}</b> · 피 <b>${cur.D}%</b>
-      · 치명% <b>${(oldP*100).toFixed(1)}%</b>
+      · 치명% <b>${(oldP*100).toFixed(1)}%</b>${tdefMsg}
     </div>`;
   }
 
@@ -4973,25 +5941,33 @@ function updateDpsView() {
 
   const next = {
     A: cur.A + delta.A, C: cur.C + delta.C, P: cur.P + delta.P,
-    H: cur.H + delta.H, D: cur.D + delta.D,
+    H: cur.H + delta.H, D: cur.D + delta.D, T: cur.T,
   };
   const newP = next.A + next.P > 0 ? next.C / (next.A + next.P) : 0;
 
-  const results = TO_MODELS.map(m => {
-    const oldDPS = toPredict(cur, m);
-    const newDPS = toPredict(next, m);
-    return { ...m, pct: (newDPS / oldDPS - 1) * 100 };
-  });
-  const minP = Math.min(...results.map(r => r.pct));
-  const maxP = Math.max(...results.map(r => r.pct));
-  const meanP = results.reduce((s, r) => s + r.pct, 0) / results.length;
+  const bonuses = getCurrentBonuses();
+  const oldDPS = toPredict(cur, bonuses);
+  const newDPS = toPredict(next, bonuses);
+  const pct = (newDPS / oldDPS - 1) * 100;
+  // 기여 분해: sumRaw 변화 vs 피해보너스 변화를 분리
+  const rawComp = (s) => {
+    const bA = (bonuses.bA && bonuses.bA > 0) ? bonuses.bA : 100;
+    const bC = (bonuses.bC && bonuses.bC > 0) ? bonuses.bC : 100;
+    const bP = (bonuses.bP && bonuses.bP > 0) ? bonuses.bP : 100;
+    const Peff = s.T > 0 ? Math.min(s.P, s.T) : s.P;
+    return s.A / (bA/100) + s.C / (bC/100) + Peff / (bP/100);
+  };
+  const oldSum = Math.max(1, rawComp(cur));
+  const newSum = Math.max(1, rawComp(next));
+  const sumContrib = (Math.pow(newSum / oldSum, MODEL_BETA) - 1) * 100;
+  const dContrib = ((1 + next.D/100) / (1 + cur.D/100) - 1) * 100;
 
   let verdict, verdictColor;
-  if (minP > 1) { verdict = '🟢 거의 모든 모델에서 좋은 swap. 진행 추천.'; verdictColor = '#7fff7f'; }
-  else if (maxP < -1) { verdict = '🔴 거의 모든 모델에서 나쁜 swap. 비추천.'; verdictColor = '#ff7070'; }
-  else if (meanP > 0.5) { verdict = '🟡 평균적으로 약간 좋음. 진행 가능.'; verdictColor = '#ffd070'; }
-  else if (meanP < -0.5) { verdict = '🟡 평균적으로 약간 나쁨. 비추천.'; verdictColor = '#ffa050'; }
-  else { verdict = '⚪ 차이 미미 (모델 불확실성 내). 다른 요인으로 결정.'; verdictColor = '#aaa'; }
+  if (pct > 1) { verdict = '🟢 좋은 swap. 진행 추천.'; verdictColor = '#7fff7f'; }
+  else if (pct < -1) { verdict = '🔴 나쁜 swap. 비추천.'; verdictColor = '#ff7070'; }
+  else if (pct > 0.3) { verdict = '🟡 약간 좋음.'; verdictColor = '#ffd070'; }
+  else if (pct < -0.3) { verdict = '🟡 약간 나쁨.'; verdictColor = '#ffa050'; }
+  else { verdict = '⚪ 차이 미미 (측정 noise 이내).'; verdictColor = '#aaa'; }
 
   const r0 = v => Math.round(v);
   const r1 = v => (Math.round(v * 10) / 10).toFixed(1);
@@ -5017,23 +5993,27 @@ function updateDpsView() {
         </div>
       </div>
     </div>
+    <div style="text-align:center; padding:14px; background:rgba(0,0,0,0.3); border-radius:8px; margin-bottom:10px;">
+      <div style="color:#aaa; font-size:11px; margin-bottom:4px;">예측 ΔDPS</div>
+      <div style="font-size:28px; font-weight:bold; color:${pct>0.3?'#7fff7f':pct<-0.3?'#ff7070':'#ddd'};">
+        ${pct>=0?'+':''}${pct.toFixed(2)}%
+      </div>
+    </div>
     <table style="width:100%; border-collapse:collapse; font-size:12px; margin-bottom:10px;">
       <thead>
-        <tr style="border-bottom:1px solid #555;"><th style="text-align:left; padding:5px 6px; color:#aaa; font-weight:normal;">모델</th><th style="text-align:right; padding:5px 6px; color:#aaa; font-weight:normal;">예측 ΔDPS</th></tr>
+        <tr style="border-bottom:1px solid #555;"><th style="text-align:left; padding:5px 6px; color:#aaa; font-weight:normal;">기여</th><th style="text-align:right; padding:5px 6px; color:#aaa; font-weight:normal;">단독 효과</th></tr>
       </thead>
       <tbody>
-        ${results.map(r => `<tr style="border-bottom:1px solid #2a2a3e;">
-          <td style="padding:5px 6px;"><span style="display:inline-block; width:8px; height:8px; background:${r.color}; border-radius:50%; margin-right:6px;"></span>${r.name}</td>
-          <td style="text-align:right; padding:5px 6px; color:${r.pct>0?'#7fff7f':r.pct<0?'#ff7070':'#ddd'};"><b>${r.pct>=0?'+':''}${r.pct.toFixed(2)}%</b></td>
-        </tr>`).join('')}
+        <tr style="border-bottom:1px solid #2a2a3e;">
+          <td style="padding:5px 6px;">sum_raw (공+치+관cap, β=1.09)</td>
+          <td style="text-align:right; padding:5px 6px; color:${sumContrib>0?'#7fff7f':sumContrib<0?'#ff7070':'#ddd'};"><b>${sumContrib>=0?'+':''}${sumContrib.toFixed(2)}%</b></td>
+        </tr>
+        <tr style="border-bottom:1px solid #2a2a3e;">
+          <td style="padding:5px 6px;">피해보너스 (1+D/100)</td>
+          <td style="text-align:right; padding:5px 6px; color:${dContrib>0?'#7fff7f':dContrib<0?'#ff7070':'#ddd'};"><b>${dContrib>=0?'+':''}${dContrib.toFixed(2)}%</b></td>
+        </tr>
       </tbody>
     </table>
-    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; padding:8px 10px; background:rgba(0,0,0,0.3); border-radius:6px; margin-bottom:8px;">
-      <span style="font-size:11px; color:#aaa;">범위</span>
-      <b style="font-size:13px;">${minP>=0?'+':''}${minP.toFixed(2)}% ~ ${maxP>=0?'+':''}${maxP.toFixed(2)}%</b>
-      <span style="font-size:11px; color:#aaa;">평균</span>
-      <b style="font-size:13px;">${meanP>=0?'+':''}${meanP.toFixed(2)}%</b>
-    </div>
     <div style="text-align:center; font-size:14px; padding:8px; background:rgba(255,255,255,0.04); border-radius:6px; color:${verdictColor};">
       <b>${verdict}</b>
     </div>
@@ -5042,7 +6022,7 @@ function updateDpsView() {
 }
 
 // stat input 변경 시 재계산
-['bp-atk','bp-cri','bp-pen','bp-hit','bp-dmg',
+['bp-atk','bp-cri','bp-pen','bp-hit','bp-dmg','bp-tdef',
  'bp-batk','bp-bcri','bp-bpen','bp-bhit',
  'dps-dA','dps-dC','dps-dP','dps-dH','dps-dD',
  'dps-dbA','dps-dbC','dps-dbP','dps-dbH'].forEach(id => {
