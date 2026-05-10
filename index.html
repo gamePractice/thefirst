@@ -2250,12 +2250,14 @@ function dealerCurrentSumRaw() {
 
 // 딜러 stat 1개의 ΔDPS/DPS 기여도 (raw-sum 모델, 2026-05-10)
 //
-// 분류:
-//   - 피해보너스: multiplicative, v/(100+D)
-//   - DPS stat (공격/치명/관통/명중) 또는 그 보너스: raw-equiv으로 환산 후 sum_raw에 기여
-//       (보너스% 엠블의 raw equivalent = 그 stat의 raw_base × v/100)
-//   - 방어 계열 stat 및 보너스 (HP/방어/회피/치명저항/HP보너스/방어보너스/회피보너스/치명저항보너스): 0
-//   - 피해감소: 0
+// 점수 계층 (높을수록 우선):
+//   1. 피해보너스 (항상 최강, baseline 100.0+) — multiplicative + 절대 픽 보장
+//   2. 목표 미달 stat (관통/명중/방어/HP/회피/치명저항, 1.0+) — DPS 후보 압도
+//   3. 일반 DPS stat (공격/치명/관통/명중 raw 또는 보너스, 0~0.2) — 평소 DPS 기여
+//   4. 그 외 (피해감소, 달성된 방어 계열): 0
+//
+// "피해보너스 절대 우선" 정책: 목표값 unmet 이라도 피해보너스 엠블이 먼저 픽됨.
+// 사용자 원칙: "목표가 관통이라도 피해보너스가 우선. 목표값 못채워도 피해보너스 빠지면 안 됨."
 function dealerStatGain(statName, valueStr) {
   const v = parseFloat(String(valueStr).replace(/[^0-9.\-]/g, ''));
   if (!isFinite(v) || v === 0) return 0;
@@ -2263,15 +2265,11 @@ function dealerStatGain(statName, valueStr) {
 
   if (cat === '피해보너스') {
     const cur = userStats.extras.피해보너스 || 0;
-    return v / (100 + cur);
+    // baseline 100.0 = 어떤 unmet target priority(1.0+)보다도 큼 → 피해보너스 엠블 절대 픽 보장.
+    // v/(100+cur) 미세 항으로 같은 피해보너스 엠블끼리 정렬.
+    return 100.0 + v / (100 + cur);
   }
   if (cat === '피해감소') return 0;
-
-  // 방어 계열 (raw 또는 보너스 엠블 모두): DPS 0
-  if (['HP','방어','회피','치명저항'].includes(cat)) return 0;
-
-  const sumRaw = dealerCurrentSumRaw();
-  if (sumRaw <= 0) return 0;
 
   // 보너스 엠블이면 raw-equivalent으로 환산.
   // 공격보너스 +Y%pt는 final stat을 rawBase × Y/100 만큼 증가시킴.
@@ -2283,6 +2281,26 @@ function dealerStatGain(statName, valueStr) {
   const rawBase = p.bonusPct > 0 ? p.final / (p.bonusPct / 100) : 0;
   const dRaw = isBonus ? (p.bonusPct > 0 ? rawBase * v / p.bonusPct : 0) : v;
 
+  // 목표 미달 시 우선순위 점수 (1.0+ → DPS 후보 모두 압도)
+  // dFinalCapped/target = 같은 stat 내 대소 구분
+  const targetPriority = (target) => {
+    if (target <= 0 || p.final >= target) return null;
+    const dFinal = dRaw * (p.bonusPct / 100);
+    const headroomFinal = target - p.final;
+    const dFinalCapped = Math.min(dFinal, headroomFinal);
+    if (dFinalCapped <= 0) return null;
+    return 1.0 + dFinalCapped / target;
+  };
+
+  // 방어 계열: 평소 0, 목표 미달이면 우선순위 점수
+  if (['HP','방어','회피','치명저항'].includes(cat)) {
+    const target = (userStats.targets && userStats.targets[cat]) || 0;
+    return targetPriority(target) ?? 0;
+  }
+
+  const sumRaw = dealerCurrentSumRaw();
+  if (sumRaw <= 0) return 0;
+
   if (cat === '공격') {
     return DEALER_BETA * ATTACK_RAW_WEIGHT * dRaw / sumRaw;
   }
@@ -2291,6 +2309,11 @@ function dealerStatGain(statName, valueStr) {
   }
   if (cat === '관통') {
     const def = getDealerDef();
+    const target = (userStats.targets && userStats.targets.관통) || 0;
+    // target 미달이면 우선순위 (target이 def보다 커도 그쪽으로 몰아준다)
+    const prio = targetPriority(target);
+    if (prio !== null) return prio;
+    // 평소: dealerMobDef 까지만 효율
     if (p.final >= def) return 0;
     const headroomRaw = (def - p.final) / (p.bonusPct / 100);
     const dRawCapped = Math.min(dRaw, headroomRaw);
@@ -2299,12 +2322,9 @@ function dealerStatGain(statName, valueStr) {
   }
   if (cat === '명중') {
     const target = (userStats.targets && userStats.targets.명중) || 0;
-    if (target <= 0) return 0;
-    if (p.final >= target) return 0;
-    const headroomRaw = (target - p.final) / (p.bonusPct / 100);
-    const dRawCapped = Math.min(dRaw, headroomRaw);
-    const baseGain = DEALER_BETA * HIT_RAW_WEIGHT * dRawCapped / sumRaw;
-    return baseGain + (dRawCapped > 0 ? 1e-6 : 0);
+    if (target <= 0) return 0;          // target 없으면 명중 평가 안 함 (적 회피 미지)
+    // 미달이면 우선순위, 달성이면 0
+    return targetPriority(target) ?? 0;
   }
   return 0;
 }
@@ -2786,7 +2806,7 @@ function renderAuthorNotes() {
                   style="padding:4px 10px; background:#444; color:#ddd; border:1px solid #666; border-radius:4px; font-size:12px; cursor:pointer;">기본값(${DEALER_DEF_DEFAULT})</button>
         </label>
         <div style="font-size:11px; color:#aaa; margin-top:6px;">
-          허수아비 기준 약 <b>${DEALER_DEF_DEFAULT}</b>. 다른 몬스터/렙대를 타겟팅하면 값을 변경하세요. 관통은 이 값까지만 추천에서 점수 가산.
+          허수아비 기준 약 <b>${DEALER_DEF_DEFAULT}</b>. 다른 몬스터/렙대를 타겟팅하면 값을 변경하세요. 관통은 이 값까지만 DPS 점수 가산 (단, 관통 목표값을 더 크게 설정하면 그쪽까지 우선순위로 채움).
         </div>
       </div>
       <div style="margin:8px 0 12px; padding:10px 12px; background:rgba(127,255,127,0.06); border:1px solid rgba(127,255,127,0.25); border-radius:6px;">
@@ -2812,16 +2832,18 @@ function renderAuthorNotes() {
         sum_raw = 공격_raw + 치명_raw + min(관통, ${def})_raw<br><br>
         엠블럼 1개당 <b>예측 ΔDPS%</b>를 직접 계산해서 정렬합니다. 따라서:
         <ul style="margin:6px 0 6px 20px; padding:0;">
-          <li><b>피해보너스</b>: 항상 최강 (multiplicative)</li>
-          <li><b>관통</b>: ${def}까지만 효율, 초과분 0</li>
-          <li><b>명중</b>: 목표값까지만 효율 (관통과 동일한 cap), 초과분 0</li>
+          <li><b>피해보너스</b>: 항상 최강 (multiplicative). <b>목표값 미달 stat보다도 우선</b> — 피해보너스 엠블은 무조건 픽됨</li>
+          <li><b>관통</b>: ${def}까지 DPS 점수 가산 (단, <b>관통 목표값</b>을 더 크게 설정하면 그쪽까지 우선순위로 채움)</li>
+          <li><b>명중</b>: 목표값까지 우선순위로 채움 (목표 미설정이면 평가 안 함 — 적 회피 모름)</li>
           <li><b>공격 raw</b>: 1점당 효율 <b>0.70</b> (2026-05-10 측정 fit — B/A 비교에서 raw 공격 효과 작게 측정)</li>
           <li><b>치명 raw</b>: 1점당 효율 <b>1.10</b> (사용자 게임 경험 — 긴 쿨다운 강타가 치명 의존도 높음)</li>
-          <li><b>관통 raw (cap 안)</b>: 1점당 효율 <b>0.70</b> (cap 초과시 0)</li>
+          <li><b>관통 raw (cap 안)</b>: 1점당 효율 <b>0.70</b> (cap 초과시 0, target 우선순위 적용 시 제외)</li>
           <li><b>명중 raw (target 안)</b>: 1점당 효율 1.0 (기준)</li>
           <li><b>공격보너스 / 치명보너스 / 관통보너스 / 명중보너스</b>: raw-equivalent (raw_base × v / 보너스%) 환산해 기여</li>
-          <li><b>방어보너스 / HP보너스 / 회피보너스 / 치명저항보너스</b>: DPS 0</li>
-          <li>HP / 방어 / 회피 / 치명저항 / 피해감소: DPS 0</li>
+          <li><b>방어보너스 / HP보너스 / 회피보너스 / 치명저항보너스</b>: 평소 DPS 0, 단 해당 stat의 목표값 미달 시 우선순위 가산</li>
+          <li><b>HP / 방어 / 회피 / 치명저항</b>: 평소 DPS 0, 단 <b>목표값 미달이면 DPS 후보를 제치고 최우선</b>으로 채움</li>
+          <li>피해감소: DPS 0</li>
+          <li><b>🎯 목표값 우선</b>: 관통/명중/방어/HP/회피/치명저항 목표값 미달이면 일반 DPS 후보를 압도하는 우선순위 점수로 먼저 채워짐 (단 <b>피해보너스 엠블보다는 항상 후순위</b>). 달성 후엔 평소 DPS 계산 복귀.</li>
           <li><b>🔒 stat 보존</b>: 목표값 == 현재값인 stat은 그 stat에 기여하는 현재 엠블럼을 그대로 유지 (재배치 안 함)</li>
         </ul>
       </div>`;
