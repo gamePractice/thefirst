@@ -985,6 +985,78 @@ tr.picked td { color: #ffd700; font-weight: bold; }
 .emb-swap-slot .swap-new { font-size:12px; color:#7fff7f; margin-bottom:6px; }
 .emb-swap-slot select { width:100%; padding:4px 6px; background:#1a1a2e; border:1px solid #555; border-radius:4px; color:#eee; font-size:12px; margin-bottom:4px; }
 .emb-swap-slot .reset-btn { padding:2px 8px; background:#555; color:#ddd; border:0; border-radius:3px; font-size:10px; cursor:pointer; }
+
+/* ===== 모바일 반응형 (입력칸 가로 오버플로 방지) ===== */
+html, body { max-width: 100%; overflow-x: hidden; }
+.panel, .panel-body, .group, .rune-section, .rune-result, .compute-bar,
+.exclusion-bar, .ranking-box, .final-summary-box, .rune-combat-row,
+.rune-guide-banner { max-width: 100%; }
+.panel-body { overflow-x: hidden; }
+
+@media (max-width: 720px) {
+  /* auto-fit grid의 최소폭이 화면보다 넓어 가로 스크롤이 생기는 문제 차단 */
+  .stat-grid { grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr)); }
+  .stat-grid.narrow { grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); }
+  .skills-grid { grid-template-columns: repeat(auto-fit, minmax(min(540px, 100%), 1fr)); }
+  .groups { grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); }
+  .ranking-grid { grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); }
+  .rune-pool-grid { grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr)); }
+  .current-slots { grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); }
+  .emb-row { grid-template-columns: repeat(auto-fit, minmax(min(190px, 100%), 1fr)); }
+  .emb-swap-row { grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); }
+  .rune-result .summary-grid { grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr)); }
+
+  /* DPS 계산기 입력 — input의 width:100% + span 80px 가 부모를 넘어서 잘리는 문제 */
+  .dps-input { flex-wrap: wrap; }
+  .dps-input span { flex: 0 0 auto; min-width: 70px; }
+  .dps-input input { width: auto; flex: 1 1 60px; min-width: 0; }
+
+  /* inline style 로 minmax 를 쓰는 grid 들 (DPS 입력, 추천 보석 등) */
+  [style*="minmax(140px"],
+  [style*="minmax(150px"] {
+    grid-template-columns: repeat(auto-fit, minmax(min(140px, 100%), 1fr)) !important;
+  }
+  [style*="minmax(220px"] {
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)) !important;
+  }
+
+  /* skill-fields: 720px 미만에서 3열인데 작은 화면에서는 2열로 */
+  .skill-fields { grid-template-columns: 1fr 1fr; }
+
+  /* stat-pair-row / single-row 가 좁은 화면에서 줄넘김 후에도 안 잘리게 */
+  .stat-pair-row, .stat-single-row { padding: 8px 10px; }
+  .stat-pair-row input, .stat-single-row input { min-width: 0; }
+}
+
+@media (max-width: 600px) {
+  body { padding: 10px 10px 32px; }
+  .main-content { padding: 10px 8px 60px; }
+  .panel-head { padding: 10px 12px; }
+  .panel-body { padding: 12px 10px; }
+  .group { padding: 12px 10px; }
+  .ranking-box { padding: 12px 10px; }
+  .final-summary-box { padding: 14px 12px; }
+  .rune-combat-row { padding: 10px 12px; gap: 8px; }
+
+  /* tier-row label이 너무 좁아져서 칩이 잘리지 않도록 */
+  .tier-row { flex-wrap: wrap; }
+  .tier-label { flex: 0 0 auto; min-width: 60px; }
+  .tier-chips { flex: 1 1 100%; }
+
+  /* 입력 줄 자체가 너무 좁아질 때 label을 위로 올림 */
+  .stat-pair-row, .stat-single-row { gap: 6px; }
+}
+
+@media (max-width: 420px) {
+  /* 아주 작은 화면 — label을 위로, 입력 한 줄 차지 */
+  .stat-pair-row label, .stat-single-row label {
+    flex: 0 0 100%; margin-bottom: 2px;
+  }
+  .stat-pair-row input, .stat-single-row input { flex: 1 1 80px; }
+  .skill-fields { grid-template-columns: 1fr; }
+  .role-btn { padding: 8px 12px; font-size: 13px; }
+  .compute-btn { padding: 14px 18px; font-size: 15px; min-width: 0; }
+}
 </style>
 </head>
 <body>
@@ -1010,7 +1082,7 @@ tr.picked td { color: #ffd700; font-weight: bold; }
     <div class="home-subtitle">시뮬레이터 도우미</div>
   </div>
   <div class="home-footer">
-    <span class="home-version">Version 2.5.000019</span>
+    <span class="home-version">Version 2.5.000020</span>
     <span class="home-author">made by 레인테인</span>
   </div>
 </div>
@@ -4244,7 +4316,7 @@ document.querySelectorAll('.role-btn').forEach(btn => {
 });
 
 // 현재 버전 — index.html 상단의 version-info와 일치해야 함
-const APP_VERSION = '2.5.000019';
+const APP_VERSION = '2.5.000020';
 let latestVersion = APP_VERSION;
 
 // URL에 ?v= 파라미터가 있으면 버전 정보로 쓰고 URL은 정리 (히스토리 오염 방지)
