@@ -956,35 +956,54 @@ tr.picked td { color: #ffd700; font-weight: bold; }
 }
 .main-skill-box .desc { font-size: 12px; color: #aaa; line-height: 1.5; }
 .main-skill-box label.radio { cursor: pointer; }
-/* DPS 계산기 스타일 */
-.dps-input { display:flex; align-items:center; gap:6px; font-size:12px; color:#ddd; }
-.dps-input span { min-width:80px; color:#bbb; }
-.dps-input input { width:100%; padding:4px 6px; background:#252538; border:1px solid #444; border-radius:4px; color:#eee; font-size:12px; }
-.emb-row { display:grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap:8px; }
-.emb-slot { background:#252538; border:1px solid #444; border-radius:6px; padding:8px; display:flex; flex-direction:column; gap:6px; }
-.emb-slot.swap-target { border-color:#4a8eff; box-shadow:0 0 0 2px rgba(74,142,255,0.3); }
-.emb-slot select { width:100%; padding:4px 6px; background:#1a1a2e; border:1px solid #555; border-radius:4px; color:#eee; font-size:12px; }
-.emb-slot .emb-info { font-size:11px; color:#aaa; line-height:1.4; min-height:14px; }
-.emb-slot .emb-icon { font-size:20px; text-align:center; }
-.emb-swap-btn { padding:4px 8px; background:#4a8eff; color:white; border:0; border-radius:4px; cursor:pointer; font-size:11px; }
-.emb-swap-btn:hover { background:#5e9bff; }
-.emb-swap-btn.cancel { background:#666; }
-.emb-swap-list { background:#1a1a2e; border:1px solid #4a8eff; border-radius:6px; padding:10px; margin-top:8px; }
-.emb-swap-list h5 { margin:0 0 8px; color:#4a8eff; font-size:13px; }
-.emb-swap-option { display:flex; justify-content:space-between; align-items:center; padding:6px 10px; background:#252538; border:1px solid #333; border-radius:4px; margin-bottom:5px; cursor:pointer; font-size:12px; }
-.emb-swap-option:hover { border-color:#4a8eff; background:#2c3050; }
-.emb-swap-option .emb-stats { color:#aaa; font-size:11px; }
-.dps-build-row { display:flex; flex-wrap:wrap; gap:5px; margin-top:6px; }
-.dps-build-emb { display:inline-flex; align-items:center; gap:4px; padding:3px 8px; background:#1a1a2e; border:1px solid #555; border-radius:12px; font-size:11px; color:#ddd; }
-.dps-build-emb.changed { border-color:#7fff7f; background:#1a3a1a; }
-.emb-swap-row { display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:8px; }
-.emb-swap-slot { background:#252538; border:1px solid #444; border-radius:6px; padding:8px; }
-.emb-swap-slot.changed { border-color:#7fff7f; background:#1a3a1a; }
-.emb-swap-slot .swap-current { font-size:11px; color:#aaa; margin-bottom:4px; }
-.emb-swap-slot .swap-arrow { color:#7fff7f; font-weight:bold; margin:0 4px; }
-.emb-swap-slot .swap-new { font-size:12px; color:#7fff7f; margin-bottom:6px; }
-.emb-swap-slot select { width:100%; padding:4px 6px; background:#1a1a2e; border:1px solid #555; border-radius:4px; color:#eee; font-size:12px; margin-bottom:4px; }
-.emb-swap-slot .reset-btn { padding:2px 8px; background:#555; color:#ddd; border:0; border-radius:3px; font-size:10px; cursor:pointer; }
+
+/* ===== 스탯 계산기 ===== */
+.sc-stat-row { display:flex; align-items:center; gap:8px; padding:8px 10px; background:rgba(0,0,0,0.18); border:1px solid #2a2a3e; border-radius:6px; }
+.sc-stat-row label { flex:0 0 70px; color:#ddd; font-size:13px; font-weight:bold; }
+.sc-stat-row input { flex:1 1 80px; min-width:60px; padding:4px 8px; background:#1a1a2e; border:1px solid #555; border-radius:4px; color:#eee; font-size:13px; }
+.sc-stat-row .sep { color:#666; font-size:11px; }
+.sc-stat-row .suffix { color:#888; font-size:11px; }
+.sc-swap-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.sc-swap-col { background:rgba(0,0,0,0.18); border:1px solid #2a2a3e; border-radius:6px; padding:10px 12px; }
+.sc-opt-row { display:flex; align-items:center; gap:6px; margin-bottom:6px; }
+.sc-opt-row select { flex:1 1 auto; padding:5px 6px; background:#1a1a2e; border:1px solid #555; border-radius:4px; color:#eee; font-size:12px; min-width:0; }
+.sc-opt-row input { flex:0 0 90px; padding:5px 6px; background:#1a1a2e; border:1px solid #555; border-radius:4px; color:#eee; font-size:12px; }
+.sc-opt-row .sc-unit { flex:0 0 auto; color:#888; font-size:11px; min-width:24px; }
+.sc-result-row { display:grid; grid-template-columns: 80px 1fr 20px 1fr 100px; gap:8px; align-items:center; padding:7px 10px; border-bottom:1px solid #2a2a3e; font-size:13px; }
+.sc-result-row .sc-r-cat { color:#ddd; font-weight:bold; }
+.sc-result-row .sc-r-cur { color:#aaa; text-align:right; }
+.sc-result-row .sc-r-arrow { color:#666; text-align:center; }
+.sc-result-row .sc-r-new { color:#eee; font-weight:bold; }
+.sc-result-row .sc-r-diff { text-align:right; font-weight:bold; }
+.sc-result-row .sc-r-diff.up { color:#7fff7f; }
+.sc-result-row .sc-r-diff.down { color:#ff7070; }
+.sc-result-row .sc-r-diff.same { color:#666; }
+.sc-result-bonus { font-size:11px; color:#888; }
+
+.sc-scenario-card { background:rgba(0,0,0,0.18); border:1px solid #3a3a5e; border-radius:8px; padding:12px 14px; margin-bottom:12px; }
+.sc-scenario-head { display:flex; align-items:center; gap:10px; margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid #2a2a3e; }
+.sc-scenario-head input.sc-scenario-name { flex:1 1 auto; padding:5px 10px; background:#1a1a2e; border:1px solid #555; border-radius:4px; color:#ffd070; font-size:14px; font-weight:bold; }
+.sc-scenario-head .sc-scenario-actions { display:flex; gap:6px; flex:0 0 auto; }
+.sc-scenario-head button { padding:4px 10px; border:1px solid #555; border-radius:4px; font-size:11px; cursor:pointer; background:#444; color:#ddd; }
+.sc-scenario-head button.sc-scenario-del { background:#5a2a2a; color:#ffaaaa; border-color:#7a3a3a; }
+.sc-scenario-head button.sc-scenario-del:hover { background:#7a3a3a; }
+.sc-scenario-result { margin-top:10px; padding-top:10px; border-top:1px dashed #2a2a3e; }
+.sc-compare-table { width:100%; border-collapse:collapse; font-size:13px; }
+.sc-compare-table th, .sc-compare-table td { padding:7px 10px; border-bottom:1px solid #2a2a3e; text-align:right; }
+.sc-compare-table th { color:#ffd070; font-weight:bold; background:rgba(0,0,0,0.25); position:sticky; top:0; }
+.sc-compare-table th:first-child, .sc-compare-table td:first-child { text-align:left; color:#ddd; font-weight:bold; }
+.sc-compare-table td.cmp-base { color:#888; }
+.sc-compare-table td.cmp-up   { color:#7fff7f; font-weight:bold; }
+.sc-compare-table td.cmp-down { color:#ff7070; font-weight:bold; }
+.sc-compare-table td.cmp-same { color:#aaa; }
+.sc-compare-table .cmp-sub { display:block; font-size:11px; opacity:0.7; font-weight:normal; }
+
+@media (max-width: 720px) {
+  .sc-swap-grid { grid-template-columns: 1fr; }
+  .sc-result-row { grid-template-columns: 70px 1fr 16px 1fr 80px; font-size:12px; }
+  .sc-compare-table { font-size:11px; }
+  .sc-compare-table th, .sc-compare-table td { padding:5px 6px; }
+}
 
 /* ===== 모바일 반응형 (입력칸 가로 오버플로 방지) ===== */
 html, body { max-width: 100%; overflow-x: hidden; }
@@ -1002,20 +1021,8 @@ html, body { max-width: 100%; overflow-x: hidden; }
   .ranking-grid { grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); }
   .rune-pool-grid { grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr)); }
   .current-slots { grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); }
-  .emb-row { grid-template-columns: repeat(auto-fit, minmax(min(190px, 100%), 1fr)); }
-  .emb-swap-row { grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); }
   .rune-result .summary-grid { grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr)); }
 
-  /* DPS 계산기 입력 — input의 width:100% + span 80px 가 부모를 넘어서 잘리는 문제 */
-  .dps-input { flex-wrap: wrap; }
-  .dps-input span { flex: 0 0 auto; min-width: 70px; }
-  .dps-input input { width: auto; flex: 1 1 60px; min-width: 0; }
-
-  /* inline style 로 minmax 를 쓰는 grid 들 (DPS 입력, 추천 보석 등) */
-  [style*="minmax(140px"],
-  [style*="minmax(150px"] {
-    grid-template-columns: repeat(auto-fit, minmax(min(140px, 100%), 1fr)) !important;
-  }
   [style*="minmax(220px"] {
     grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)) !important;
   }
@@ -1068,8 +1075,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
     <button class="menu-btn active" data-view="home">🏠 Home</button>
     <button class="menu-btn" data-view="calculator">🧮 엠블럼 추천기</button>
     <button class="menu-btn" data-view="rune">🪬 룬 시뮬레이터</button>
-    <!-- DPS 계산기는 lvl 80 풀세트 재측정 후 다시 활성화 -->
-    <!-- <button class="menu-btn" data-view="crit">📊 DPS 계산기 (예측)</button> -->
+    <button class="menu-btn" data-view="stat">📊 스탯 계산기</button>
     <button class="menu-btn" data-view="help">📖 도움말</button>
   </div>
 </nav>
@@ -1197,147 +1203,44 @@ html, body { max-width: 100%; overflow-x: hidden; }
 
 </div><!-- /view-calculator -->
 
-<div class="view" id="view-crit" style="display:none">
+<div class="view" id="view-stat" style="display:none">
   <div style="max-width:1100px; margin:0 auto;">
 
-    <!-- Panel 1: 현재 속성 입력 -->
     <div class="panel open" style="margin-bottom:14px;">
       <div class="panel-head">
         <span>🔢 현재 속성 입력</span>
       </div>
       <div class="panel-body">
-        <div class="hint" style="margin-bottom:12px;">
-          본인 캐릭터의 <b>속성정보 패널 값</b>을 입력하세요.
+        <div class="hint" style="margin-bottom:10px;">
+          게임 내 <b>속성정보 패널</b>의 값을 그대로 입력하세요. 각 스탯의 <b>최종값</b>과 <b>보너스%</b>를 입력합니다.
         </div>
 
-        <h4 style="color:#ffe07a; margin:6px 0; font-size:14px;">기본 속성</h4>
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:6px 12px; margin-bottom:14px;">
-          <label class="dps-input"><span>공격</span><input id="bp-atk" type="number" value="23566"></label>
-          <label class="dps-input"><span>치명</span><input id="bp-cri" type="number" value="18314"></label>
-          <label class="dps-input"><span>관통</span><input id="bp-pen" type="number" value="6631"></label>
-          <label class="dps-input"><span>명중</span><input id="bp-hit" type="number" value="3627"></label>
-          <label class="dps-input"><span>HP</span><input id="bp-hp" type="number" value="4329081"></label>
-          <label class="dps-input"><span>치명저항</span><input id="bp-cdef" type="number" value="2171"></label>
-          <label class="dps-input"><span>회피</span><input id="bp-eva" type="number" value="11099"></label>
-          <label class="dps-input"><span>방어</span><input id="bp-def" type="number" value="5878"></label>
-        </div>
+        <h4 style="color:#ff9050; margin:8px 0 4px; font-size:14px;">⚔️ 공격쪽</h4>
+        <div class="stat-grid" id="sc-offense-grid"></div>
 
-        <h4 style="color:#ffe07a; margin:6px 0; font-size:14px;">고급 속성 (보너스 %)</h4>
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:6px 12px;">
-          <label class="dps-input"><span>공격보너스</span><input id="bp-batk" type="number" value="212.1" step="0.1">%</label>
-          <label class="dps-input"><span>치명보너스</span><input id="bp-bcri" type="number" value="252.8" step="0.1">%</label>
-          <label class="dps-input"><span>관통보너스</span><input id="bp-bpen" type="number" value="134.4" step="0.1">%</label>
-          <label class="dps-input"><span>명중보너스</span><input id="bp-bhit" type="number" value="138.8" step="0.1">%</label>
-          <label class="dps-input"><span>피해보너스</span><input id="bp-dmg" type="number" value="85.7" step="0.1">%</label>
-          <label class="dps-input"><span>HP보너스</span><input id="bp-bhp" type="number" value="148.7" step="0.1">%</label>
-          <label class="dps-input"><span>치명저항보너스</span><input id="bp-bcdef" type="number" value="134.7" step="0.1">%</label>
-          <label class="dps-input"><span>회피보너스</span><input id="bp-beva" type="number" value="214.7" step="0.1">%</label>
-          <label class="dps-input"><span>방어보너스</span><input id="bp-bdef" type="number" value="144.9" step="0.1">%</label>
-          <label class="dps-input"><span>피해감소</span><input id="bp-dr" type="number" value="36.6" step="0.1">%</label>
-        </div>
-
-        <h4 style="color:#ff9090; margin:14px 0 6px; font-size:14px;">🎯 대상 (적) 정보</h4>
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:6px 12px;">
-          <label class="dps-input"><span>대상 방어</span><input id="bp-tdef" type="number" value="0"></label>
-        </div>
-        <div class="hint" style="font-size:11px; margin-top:6px; color:#999;">
-          eff_A = 공격 − max(0, 대상방어 − 관통). 관통이 대상방어 미만이면 차감, 이상이면 풀반영.<br>
-          <b>허수아비 적정 관통 약 9000</b>. <b>0</b> 입력 시 over-pierce 가정 (관통 변화 무시).
-        </div>
+        <h4 style="color:#90ff90; margin:14px 0 4px; font-size:14px;">🛡️ 방어쪽</h4>
+        <div class="stat-grid" id="sc-defense-grid"></div>
       </div>
     </div>
 
-    <!-- Panel 2: 현재 엠블럼 입력 -->
-    <div class="panel open" style="margin-bottom:14px;">
-      <div class="panel-head">
-        <span>💎 현재 엠블럼 입력 (15 슬롯)</span>
-      </div>
-      <div class="panel-body">
-        <div class="hint" style="margin-bottom:12px;">
-          착용 중인 엠블럼을 선택하세요. 카테고리별 4개씩 (총 12).
-        </div>
-
-        <h4 style="color:#ff9050; margin:6px 0; font-size:14px;">⚔️ 기교 (4)</h4>
-        <div class="emb-row" id="emb-row-기교"></div>
-
-        <h4 style="color:#9090ff; margin:10px 0 6px; font-size:14px;">🧠 지혜 (4)</h4>
-        <div class="emb-row" id="emb-row-지혜"></div>
-
-        <h4 style="color:#90ff90; margin:10px 0 6px; font-size:14px;">💚 활력 (4)</h4>
-        <div class="emb-row" id="emb-row-활력"></div>
-      </div>
+    <div class="hint" style="margin: 0 0 10px; padding: 10px 14px; background:rgba(127,255,127,0.05); border:1px solid rgba(127,255,127,0.25); border-radius:8px;">
+      각 <b>시나리오</b>는 독립적으로 <b>기본 스탯</b>에서 계산됩니다. <b>+ 시나리오 추가</b> 버튼으로 여러 대안을 비교해보세요.<br>
+      값은 <b>엠블럼 표기 그대로</b> 입력 (raw stat은 raw 수치, 보너스/피해보너스/피해감소는 %pt).
     </div>
 
-    <!-- Panel 3: DPS 예측기 -->
-    <div class="panel open" style="margin-bottom:14px;">
+    <div id="sc-scenarios-container"></div>
+
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin: 12px 0 14px;">
+      <button onclick="scAddScenario()" style="padding:8px 16px; background:#4a8eff; color:#fff; border:0; border-radius:6px; font-size:13px; cursor:pointer; font-weight:bold;">+ 시나리오 추가</button>
+      <button onclick="scToggleCompare()" style="padding:8px 16px; background:#7fcf6f; color:#0a1a0a; border:0; border-radius:6px; font-size:13px; cursor:pointer; font-weight:bold;">📊 최종 비교 보기</button>
+    </div>
+
+    <div class="panel open" id="sc-compare-panel" style="margin-bottom:14px; display:none;">
       <div class="panel-head">
-        <span>📊 DPS 예측기</span>
+        <span>📊 시나리오 최종 비교</span>
       </div>
       <div class="panel-body">
-        <div class="hint" style="margin-bottom:12px;">
-          현재 빌드에서 <b>속성을 더 올리거나, 엠블럼을 바꿨을 때</b> DPS가 어떻게 변하는지 예측합니다.
-        </div>
-
-        <h4 style="color:#ffe07a; margin:8px 0; font-size:14px;">① 기본 속성 변경 (final 값 기준)</h4>
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:6px 12px; margin-bottom:10px;">
-          <label class="dps-input"><span>Δ공격</span><input id="dps-dA" type="number" value="0"></label>
-          <label class="dps-input"><span>Δ치명</span><input id="dps-dC" type="number" value="0"></label>
-          <label class="dps-input"><span>Δ관통</span><input id="dps-dP" type="number" value="0"></label>
-          <label class="dps-input"><span>Δ명중</span><input id="dps-dH" type="number" value="0"></label>
-        </div>
-        <h4 style="color:#ffe07a; margin:8px 0; font-size:14px;">고급 속성 변경 (%pt)</h4>
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:6px 12px; margin-bottom:14px;">
-          <label class="dps-input"><span>Δ공격보너스</span><input id="dps-dbA" type="number" value="0" step="0.1">%pt</label>
-          <label class="dps-input"><span>Δ치명보너스</span><input id="dps-dbC" type="number" value="0" step="0.1">%pt</label>
-          <label class="dps-input"><span>Δ관통보너스</span><input id="dps-dbP" type="number" value="0" step="0.1">%pt</label>
-          <label class="dps-input"><span>Δ명중보너스</span><input id="dps-dbH" type="number" value="0" step="0.1">%pt</label>
-          <label class="dps-input"><span>Δ피해보너스</span><input id="dps-dD" type="number" value="0" step="0.1">%pt</label>
-        </div>
-
-        <h4 style="color:#ffe07a; margin:8px 0; font-size:14px;">② 엠블럼 변경 (선택)</h4>
-        <div class="hint" style="font-size:12px; margin-bottom:8px;">
-          각 슬롯의 dropdown에서 변경할 엠블럼을 선택하면 옆에 변경 내역이 표시됩니다.<br>
-          이 변경은 <b>예측만</b>이며 위 "현재 엠블럼 입력"에는 영향 없음.
-        </div>
-
-        <h4 style="color:#ff9050; margin:10px 0 6px; font-size:13px;">⚔️ 기교 (4)</h4>
-        <div class="emb-swap-row" id="dps-swap-기교"></div>
-
-        <h4 style="color:#9090ff; margin:10px 0 6px; font-size:13px;">🧠 지혜 (4)</h4>
-        <div class="emb-swap-row" id="dps-swap-지혜"></div>
-
-        <h4 style="color:#90ff90; margin:10px 0 6px; font-size:13px;">💚 활력 (4)</h4>
-        <div class="emb-swap-row" id="dps-swap-활력"></div>
-
-        <div style="margin:10px 0;">
-          <button onclick="resetAllSwaps()" style="padding:5px 12px; background:#444; color:#ddd; border:1px solid #666; border-radius:4px; font-size:12px; cursor:pointer;">🔄 모든 변경 리셋</button>
-        </div>
-
-        <h4 style="color:#ffe07a; margin:8px 0; font-size:14px;">📈 예측 결과</h4>
-        <div id="dps-current" style="background:rgba(255,215,0,0.08); border:1px solid rgba(255,215,0,0.35); border-radius:8px; padding:10px; margin-bottom:10px;"></div>
-        <div id="dps-result" style="background:rgba(127,255,127,0.05); border:1px solid rgba(127,255,127,0.25); border-radius:8px; padding:12px; font-size:13px;">
-          속성 또는 엠블럼을 변경하면 결과가 나타납니다.
-        </div>
-
-        <div style="margin-top:14px; padding:10px 12px; background:rgba(255,215,0,0.06); border:1px solid rgba(255,215,0,0.25); border-radius:6px; font-size:12px; line-height:1.7;">
-          <div style="color:#ffe07a; font-weight:bold; margin-bottom:6px;">📌 스탯 우선순위 가이드 (허수아비 적정 관통 약 9000)</div>
-          <div style="color:#ddd;">
-            <b style="color:#ffd070;">0순위</b> 피해보너스 — 항상 최강, sum_raw에 곱연산<br>
-            <b style="color:#ffd070;">1순위</b> 명중 — miss 뜨면 추가, 안 뜨면 효과 0<br>
-            <b style="color:#ffd070;">2순위</b> 관통 (적정값까지) / 공격 / 치명 — <b>raw 1점당 동일 효율</b><br>
-            <span style="color:#aaa; font-size:11px;">→ 관통은 적정값(약 9000)에서 cap. 그 외엔 raw 1점 = 1점이라 어떤 stat에 투자해도 동일 DPS.<br>
-              (단 final 기준 효율은 보너스%가 다르므로 차이남: 공격 보너스 222%면 final 1점당 raw 0.45점)</span>
-          </div>
-          <div style="margin-top:8px; padding-top:8px; border-top:1px dashed rgba(255,215,0,0.2); color:#bbb; font-size:11px;">
-            <b style="color:#ffd070;">모델 변경 (2026-05-10):</b> 중국 서버 컨센서스 "raw 1점 = 1점" 적용. 우리 16점 측정 (1.27:1)도 ±20% noise 안에서 호환.<br>
-            DPS ∝ sum_raw<sup>1.09</sup> × (1 + 피해보너스/100). 측정 RMS 1.5%.
-          </div>
-        </div>
-        <p class="hint" style="margin-top:10px; font-size:11px; color:#999;">
-          모델 (2026-05-10 raw-sum, 중국 서버 컨센서스 적용): <b>DPS ∝ sum_raw<sup>1.09</sup> × (1+D%)</b><br>
-          sum_raw = 공격_raw + 치명_raw + min(관통, 대상방어)_raw. raw = final / (보너스%/100).<br>
-          명중은 miss-threshold만 넘으면 효과 없음으로 가정 (모델 미반영).
-        </p>
+        <div id="sc-compare-body"></div>
       </div>
     </div>
 
@@ -1346,6 +1249,25 @@ html, body { max-width: 100%; overflow-x: hidden; }
 
 <div class="view" id="view-help" style="display:none">
   <div class="help-content guide-body">
+
+    <div style="margin: 0 0 14px; padding: 10px 14px; background:rgba(127,255,127,0.05); border:1px solid rgba(127,255,127,0.25); border-radius:8px;">
+      <div style="font-weight:bold; color:#ffd070; margin-bottom:6px;">📚 메뉴 안내</div>
+      <div style="color:#ddd; font-size:13px; line-height:1.7;">
+        아래 패널을 클릭해서 펼치면 각 메뉴의 자세한 사용법을 볼 수 있습니다.
+      </div>
+      <ul style="margin:8px 0 0; padding-left:20px; color:#ddd; font-size:13px;">
+        <li><b>🧮 엠블럼 추천기</b> — 내 스탯/우선순위/목표값에 맞춰 15 슬롯 엠블럼 조합 자동 추천</li>
+        <li><b>🪬 룬 시뮬레이터</b> — 스킬·룬 데이터 입력 후 DPS 최대화 룬 조합 자동 탐색 (딜러)</li>
+        <li><b>📊 스탯 계산기</b> — 옵션 교체 시 최종 스탯 변화를 시나리오별로 시뮬레이션·비교</li>
+      </ul>
+    </div>
+
+    <div class="panel" id="help-emblem-panel">
+      <div class="panel-head" onclick="togglePanel('help-emblem-panel')">
+        <span>🧮 엠블럼 추천기</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="panel-body">
 
     <h4>🚀 빠른 시작 (3단계)</h4>
     <ol>
@@ -1426,6 +1348,101 @@ html, body { max-width: 100%; overflow-x: hidden; }
 
     <p class="q">Q. 현재 장착 엠블럼을 입력하지 않아도 쓸 수 있나요?</p>
     <p>네, 비워두셔도 추천 조합은 정상 계산됩니다. 다만 ✓보유 / 🔧급수 UP 같은 <b>획득 상태 태그</b>와 <b>정확한 교체 효과 수치</b>는 나오지 않습니다.</p>
+
+      </div><!-- /help-emblem-panel body -->
+    </div><!-- /help-emblem-panel -->
+
+    <div class="panel" id="help-rune-panel">
+      <div class="panel-head" onclick="togglePanel('help-rune-panel')">
+        <span>🪬 룬 시뮬레이터</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="panel-body">
+
+    <h4>🚀 빠른 시작 (3단계)</h4>
+    <ol>
+      <li><b>스킬 입력</b> — 본인 클래스의 기본/코어/전술/궁극 스킬 데이터(피해배율 · 피해수 · 쿨타임 · 쿨감% 등) 입력</li>
+      <li><b>메인 딜 스킬 선택</b> — 비중이 가장 큰 주력 스킬(코어 또는 전술) 라디오 선택</li>
+      <li><b>🚀 최적 조합 자동 탐색</b> 버튼 → 38,760개 조합 중 메인 딜 스킬 DPS 최대화 룬 조합 자동 추천</li>
+    </ol>
+    <p style="color:#aaa; font-size:12px;">※ 현재 <b>딜러</b> 역할만 정식 지원. 탱커/힐러는 개발 중.</p>
+
+    <h4>⏱️ 전투시간</h4>
+    <p>5~3600초. 누적 DPS 계산 기준이며, 룬 조합 간 <b>상대 비교</b>에는 큰 영향 없습니다 (룬 효과가 모두 multiplicative라). 긴 보스전 시뮬은 600~1800초 권장.</p>
+
+    <h4>⚔️ 스킬 세팅</h4>
+    <ul>
+      <li><b>기본 피해량</b> — 캐릭터 최종 공격력 베이스. 모든 피해의 기준값.</li>
+      <li><b>모션 딜레이</b> — 코어/전술/궁극 스킬 시전 시 다른 행동 불가 시간(초) → 평타 손실로 환산. 우선순위는 <b>궁극 → 전술 → 코어 → 기본</b>.</li>
+      <li><b>기본스킬</b> — 모든 클래스 공통, 쿨타임 1초 고정. 피해배율 · 피해수 · 지속시간만 입력.</li>
+      <li><b>코어 / 전술 / 궁극</b> — 기본쿨타임 · 쿨감%(합연산) · 피해배율 · 피해수 · 지속시간 입력. <b>룬 쿨감/공속은 스킬에 적용되지 않습니다</b>.</li>
+      <li>실효쿨타임 = 기본쿨타임 × (1 − 쿨감/100). <b>1마리당 한 번만 피해</b>면 피해수 = 1, <b>즉시 피해</b>면 지속시간 = 0.</li>
+      <li>입력값은 자동 저장됩니다.</li>
+    </ul>
+
+    <h4>🪬 룬 풀 — 코어 1개 + 서포트 4개</h4>
+    <ul>
+      <li>카드를 직접 클릭해서 코어 1개 + 서포트 4개 선택 → 결과 즉시 갱신</li>
+      <li><b>🚀 최적 조합 자동 탐색</b>: 메인 딜 스킬의 DPS를 최대화하는 조합을 brute force로 찾음 (코어 8 × 서포트 C(20,4) = 38,760 조합)</li>
+      <li><b>🗑️ 선택 해제</b>: 현재 선택 초기화</li>
+    </ul>
+
+    <h4>📊 결과 보기</h4>
+    <p>선택된 5개 룬으로 계산된 <b>스킬별 DPS · 누적 피해 · 평타 비중 · 코어/서포트 효과</b>가 표시됩니다. 룬 효과는 모두 multiplier로 작용하므로 <b>절대 DPS 값과 무관하게 룬 조합 간 상대 비교는 정확</b>합니다.</p>
+
+    <p class="q">Q. 추천된 조합인데 실제 인게임 DPS가 다를 수 있나요?</p>
+    <p>네. 시뮬은 평균 모델 기준이며 실제 컨트롤·타이밍·몹 배치에 따라 달라집니다. 단 <b>"어떤 룬 조합이 상대적으로 더 강한가"</b>는 신뢰할 수 있습니다.</p>
+
+      </div><!-- /help-rune-panel body -->
+    </div><!-- /help-rune-panel -->
+
+    <div class="panel" id="help-stat-panel">
+      <div class="panel-head" onclick="togglePanel('help-stat-panel')">
+        <span>📊 스탯 계산기</span>
+        <span class="caret">▶</span>
+      </div>
+      <div class="panel-body">
+
+    <h4>📌 무엇을 하는 도구인가요?</h4>
+    <p>현재 옵션을 다른 옵션으로 <b>교체했을 때 최종 스탯이 어떻게 변하는지</b> 미리 보는 도구입니다. 엠블럼/장비/보석 옵션 변경 전 효과를 비교할 때 유용합니다.</p>
+
+    <h4>🚀 사용 방법 (4단계)</h4>
+    <ol>
+      <li><b>🔢 현재 속성 입력</b> — 게임 [속성 정보]의 값을 그대로 입력 (공격쪽 + 방어쪽 모두, 각 스탯의 <b>최종값</b>과 <b>보너스%</b>)</li>
+      <li><b>시나리오 카드</b>에서 <b>📌 현재 옵션</b>(지금 장착 중인 효과 최대 2개)을 선택하고 값 입력</li>
+      <li>오른쪽 <b>✨ 변경 예정 옵션</b>(바꿀 효과 최대 2개)을 선택하고 값 입력</li>
+      <li>카드 하단에 <b>변경 후 최종 스탯</b>이 즉시 표시됩니다</li>
+    </ol>
+
+    <h4>🧪 시나리오 비교</h4>
+    <ul>
+      <li><b>+ 시나리오 추가</b> 버튼으로 카드를 여러 개 만들 수 있습니다. 시나리오 이름은 편집 가능.</li>
+      <li>각 시나리오는 <b>독립적으로</b> 기본 스탯에서 계산됩니다 (서로 누적 X).</li>
+      <li><b>📊 최종 비교 보기</b> 버튼 → 모든 시나리오의 결과를 표 형태로 한눈에 비교.</li>
+      <li>카드의 <b>🔄 리셋</b>은 그 시나리오의 옵션만 초기화. <b>✕ 삭제</b>는 시나리오 자체 제거 (최소 1개는 유지).</li>
+    </ul>
+
+    <h4>📐 입력 단위</h4>
+    <table class="guide-tags">
+      <tr><td>raw 스탯</td><td>공격/치명/명중/관통/HP/방어/치명저항/회피 → <b>raw 수치</b> (엠블 "+460" 같은 형식)</td></tr>
+      <tr><td>~보너스</td><td>공격보너스/치명보너스 등 → <b>%pt</b> (엠블 "+10.5%" 같은 형식)</td></tr>
+      <tr><td>피해보너스/감소</td><td>자체가 % → <b>%pt</b></td></tr>
+    </table>
+
+    <h4>🧮 계산 공식</h4>
+    <div class="formula">raw 스탯: newFinal = (rawBase + Δraw) × (보너스% + Δ보너스) / 100
+피해보너스/피해감소: newValue = oldValue + Δ%pt</div>
+    <p style="font-size:12px; color:#aaa;">엠블럼 추천기의 "교체 시 최종 스탯 예측"과 동일한 공식 (cross term 포함).</p>
+
+    <p class="q">Q. 입력한 값은 엠블럼 추천기와 공유되나요?</p>
+    <p>아니요. 스탯 계산기는 <b>별도의 입력</b>이며 localStorage에 따로 저장됩니다. 엠블럼 추천기 입력에 영향을 주지 않습니다.</p>
+
+    <p class="q">Q. 옵션을 하나만 선택해도 동작하나요?</p>
+    <p>네. 슬롯 2개 중 하나만 채워도 계산됩니다. 또한 "현재 옵션"만 입력(변경 X)하면 그 옵션을 떼어낸 효과를, "변경 옵션"만 입력(현재 X)하면 새로 추가하는 효과를 계산합니다.</p>
+
+      </div><!-- /help-stat-panel body -->
+    </div><!-- /help-stat-panel -->
+
   </div>
 </div>
 
@@ -2395,7 +2412,8 @@ function setDealerMode(v) {
   }
 }
 function isDealerDpsMode() {
-  return currentRole === '딜러' && getDealerMode() === 'dps';
+  // DPS 기반 추천 선택지 제거 (2026-06-07) — 항상 priority 모드 사용
+  return false;
 }
 
 // 보석/엠블 추천 정책
@@ -4102,29 +4120,11 @@ function renderEditors() {
 }
 
 function renderDealerModeSelector() {
+  // DPS 기반 추천 선택지 제거 (2026-06-07) — 딜러는 항상 우선순위 모드
   const root = document.getElementById('dealer-mode-selector');
   if (!root) return;
-  if (currentRole !== '딜러') {
-    root.style.display = 'none';
-    root.innerHTML = '';
-    return;
-  }
-  root.style.display = '';
-  const mode = getDealerMode();
-  root.innerHTML = `
-    <div style="margin:0 0 14px; padding:10px 14px; background:rgba(255,215,0,0.06); border:1px solid rgba(255,215,0,0.25); border-radius:8px;">
-      <div style="color:#ffe07a; font-weight:bold; margin-bottom:6px;">⚔️ 딜러 추천 방식 선택</div>
-      <label style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:4px 0;">
-        <input type="radio" name="dealer-mode" value="priority" ${mode === 'priority' ? 'checked' : ''}
-               onchange="setDealerMode('priority'); renderAll();">
-        <span><b>우선순위 기반</b> <span style="color:#aaa; font-size:11px;">(탱커/힐러와 동일하게 티어 편집으로 추천)</span></span>
-      </label>
-      <label style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:4px 0;">
-        <input type="radio" name="dealer-mode" value="dps" ${mode === 'dps' ? 'checked' : ''}
-               onchange="setDealerMode('dps'); renderAll();">
-        <span><b>DPS 공식 기반</b> <span style="color:#aaa; font-size:11px;">(raw-sum 모델로 예측 ΔDPS 최대 조합 자동 산출 · 보석 통합 추천)</span></span>
-      </label>
-    </div>`;
+  root.style.display = 'none';
+  root.innerHTML = '';
 }
 
 function renderGemsPanel() {
@@ -5809,686 +5809,441 @@ function renderDmgCharts() {
   }).join('');
 }
 
-// ===== 빌드 우선순위 분석 (치명 확률 계산기 메뉴) =====
-const BP_REG = { M: 294.0, beta: 0.556, X: 11810, Y: 17651 };
-const BP_SWEET_LO = 48, BP_SWEET_HI = 56;
 
-function bpReadInputs() {
-  const get = id => parseFloat(document.getElementById(id).value) || 0;
-  return {
-    A: Math.max(1, get('bp-atk')),
-    C: Math.max(0, get('bp-cri')),
-    P: Math.max(0, get('bp-pen')),
-    H: Math.max(0, get('bp-hit')),
-    DB: Math.max(0, get('bp-dmg')),
-    D: Math.max(0, get('bp-def')),
-    E: Math.max(0, get('bp-eva')),
-  };
+// ===== 스탯 계산기 =====
+// 옵션 변경(현재 2개 → 변경 예정 2개) 시뮬레이션. 엠블 추천기와 별도의 입력/저장.
+// raw stat (공격/치명/명중/관통/HP/방어/치명저항/회피): final + bonusPct 입력, 옵션값은 raw
+// bonus stat (~보너스): 옵션값은 %pt → 해당 카테고리의 bonusPct에 가산
+// 피해보너스/피해감소: 자체가 % → 옵션값은 %pt
+const SC_PAIR_OFFENSE = ['공격','치명','명중','관통'];
+const SC_PAIR_DEFENSE = ['HP','방어','치명저항','회피'];
+const SC_PAIRS = [...SC_PAIR_OFFENSE, ...SC_PAIR_DEFENSE];
+
+// 옵션 dropdown에 들어갈 항목들
+const SC_OPT_TYPES = [
+  { value: '', label: '— 선택 안 함 —', kind: 'none' },
+  // raw flat
+  ...SC_PAIRS.map(s => ({ value: s, label: s, kind: 'raw', cat: s, unit: '' })),
+  // bonus %pt (raw stat의 보너스%)
+  ...SC_PAIRS.map(s => ({ value: s + '보너스', label: s + '보너스', kind: 'bonus', cat: s, unit: '%pt' })),
+  // 직접 %
+  { value: '피해보너스', label: '피해보너스', kind: 'extra', cat: '피해보너스', unit: '%pt' },
+  { value: '피해감소',   label: '피해감소',   kind: 'extra', cat: '피해감소',   unit: '%pt' },
+];
+function scOptDef(value) { return SC_OPT_TYPES.find(o => o.value === value) || SC_OPT_TYPES[0]; }
+
+// 기본값
+function scMakeScenario(name) {
+  return { name: name || '시나리오 1',
+    current: [{ type:'', val:0 }, { type:'', val:0 }],
+    next:    [{ type:'', val:0 }, { type:'', val:0 }] };
+}
+const SC_DEFAULT = {
+  pairs: {
+    공격:    { final: 17338,  bonusPct: 195.7 },
+    치명:    { final: 18030,  bonusPct: 150.0 },
+    명중:    { final: 4335,   bonusPct: 150.0 },
+    관통:    { final: 5202,   bonusPct: 150.0 },
+    HP:      { final: 300000, bonusPct: 100.0 },
+    방어:    { final: 8000,   bonusPct: 100.0 },
+    치명저항:{ final: 5000,   bonusPct: 100.0 },
+    회피:    { final: 3000,   bonusPct: 100.0 },
+  },
+  extras: { 피해보너스: 50, 피해감소: 30 },
+  scenarios: [scMakeScenario('시나리오 1')],
+};
+
+let scState;
+try {
+  const stored = localStorage.getItem('statCalc_v1');
+  scState = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(SC_DEFAULT));
+} catch (e) { scState = JSON.parse(JSON.stringify(SC_DEFAULT)); }
+// 누락 필드 보강
+if (!scState.pairs) scState.pairs = JSON.parse(JSON.stringify(SC_DEFAULT.pairs));
+if (!scState.extras) scState.extras = { ...SC_DEFAULT.extras };
+for (const k of SC_PAIRS) {
+  if (!scState.pairs[k]) scState.pairs[k] = { ...SC_DEFAULT.pairs[k] };
+  if (typeof scState.pairs[k].final !== 'number') scState.pairs[k].final = SC_DEFAULT.pairs[k].final;
+  if (typeof scState.pairs[k].bonusPct !== 'number') scState.pairs[k].bonusPct = SC_DEFAULT.pairs[k].bonusPct;
+}
+for (const k of ['피해보너스','피해감소']) {
+  if (typeof scState.extras[k] !== 'number') scState.extras[k] = SC_DEFAULT.extras[k];
+}
+// v1 → v2 마이그레이션: 단일 current/next 를 첫 시나리오로 이관
+if (!Array.isArray(scState.scenarios)) {
+  const legacyCur = Array.isArray(scState.current) ? scState.current : null;
+  const legacyNext = Array.isArray(scState.next)   ? scState.next   : null;
+  const sc = scMakeScenario('시나리오 1');
+  if (legacyCur && legacyCur.length === 2) sc.current = legacyCur;
+  if (legacyNext && legacyNext.length === 2) sc.next = legacyNext;
+  scState.scenarios = [sc];
+  delete scState.current; delete scState.next;
+}
+if (scState.scenarios.length === 0) scState.scenarios = [scMakeScenario('시나리오 1')];
+// 각 시나리오 필드 보강
+scState.scenarios.forEach((s, i) => {
+  if (typeof s.name !== 'string' || !s.name) s.name = '시나리오 ' + (i + 1);
+  if (!Array.isArray(s.current) || s.current.length !== 2) s.current = [{ type:'', val:0 }, { type:'', val:0 }];
+  if (!Array.isArray(s.next)    || s.next.length    !== 2) s.next    = [{ type:'', val:0 }, { type:'', val:0 }];
+});
+
+function scSave() {
+  try { localStorage.setItem('statCalc_v1', JSON.stringify(scState)); } catch (e) {}
 }
 
-function bpDmg(s) {
-  const effP = Math.min(s.P, s.D);
-  const effH = Math.min(s.H, s.E);
-  const q = s.A + s.P;
-  const p = q > 0 ? s.C / q : 0;
-  return BP_REG.M * Math.pow(s.A, BP_REG.beta) * (1 + effP/BP_REG.X) * (1 + effH/BP_REG.Y) * (1 + s.DB/100) * (1 + p);
+function scAddScenario() {
+  // 다음 시나리오 이름 생성 (시나리오 N 자동 채번 — 기존 이름이 패턴이 아니어도 충돌 회피)
+  let n = scState.scenarios.length + 1;
+  const used = new Set(scState.scenarios.map(s => s.name));
+  while (used.has('시나리오 ' + n)) n++;
+  scState.scenarios.push(scMakeScenario('시나리오 ' + n));
+  scSave();
+  scRenderScenarios();
 }
 
-function bpCritPct(s) {
-  return (s.A + s.P) > 0 ? s.C / (s.A + s.P) * 100 : 0;
+function scDeleteScenario(idx) {
+  if (scState.scenarios.length <= 1) return; // 최소 1개 유지
+  scState.scenarios.splice(idx, 1);
+  scSave();
+  scRenderScenarios();
+  scRenderCompareIfOpen();
 }
 
-function renderBuildPriority() {
-  const summary = document.getElementById('bp-summary');
-  const sweet = document.getElementById('bp-sweetspot');
-  const priority = document.getElementById('bp-priority');
-  const curve = document.getElementById('bp-curve');
-  const recommend = document.getElementById('bp-recommendation');
-  if (!summary || !sweet || !priority || !curve || !recommend) return;
+function scResetScenario(idx) {
+  const name = scState.scenarios[idx].name;
+  scState.scenarios[idx] = scMakeScenario(name);
+  scSave();
+  scRenderScenarios();
+  scRenderCompareIfOpen();
+}
 
-  const s = bpReadInputs();
-  const curDmg = bpDmg(s);
-  const critPct = bpCritPct(s);
-  const sweetStatus = critPct < BP_SWEET_LO ? '⚠️ 너무 낮음 (치명 우선)'
-                    : critPct > BP_SWEET_HI ? '⚠️ 약간 과투자'
-                    : '✅ sweet spot';
+function scToggleCompare() {
+  const panel = document.getElementById('sc-compare-panel');
+  if (!panel) return;
+  const showing = panel.style.display !== 'none';
+  panel.style.display = showing ? 'none' : '';
+  if (!showing) {
+    scRenderCompare();
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
 
-  summary.innerHTML = `
-    <div style="color:#ffd700; font-weight:bold; margin-bottom:4px;">📊 현재 빌드</div>
-    <div style="color:#ddd;">
-      치명확률 <b style="color:#ffd700;">${critPct.toFixed(2)}%</b>
-      &nbsp;·&nbsp; 1타 평균 <b style="color:#ffd700;">${Math.round(curDmg).toLocaleString()}</b>
-      &nbsp;·&nbsp; <b>${sweetStatus}</b>
-      ${s.P > s.D ? `<br><span style="color:#ff8a8a; font-size:12px;">⚠️ 관통 ${s.P.toLocaleString()} > 적 방어 ${s.D.toLocaleString()} → 초과분 (${(s.P-s.D).toLocaleString()}) 무효</span>` : ''}
-    </div>
-  `;
+function scRenderCompareIfOpen() {
+  const panel = document.getElementById('sc-compare-panel');
+  if (panel && panel.style.display !== 'none') scRenderCompare();
+}
 
-  // Sweet spot bar (0~100%)
-  const barX = (pct) => `${pct}%`;
-  sweet.innerHTML = `
-    <div style="position:absolute; left:0; top:0; right:0; bottom:0;
-                background: linear-gradient(to right,
-                  #ff6b6b 0%, #ff6b6b ${BP_SWEET_LO}%,
-                  #7fff7f ${BP_SWEET_LO}%, #7fff7f ${BP_SWEET_HI}%,
-                  #ffd07a ${BP_SWEET_HI}%, #ffd07a 100%); opacity:0.3;"></div>
-    <div style="position:absolute; left:${BP_SWEET_LO}%; top:0; bottom:0; width:1px; background:#ffd700;"></div>
-    <div style="position:absolute; left:${BP_SWEET_HI}%; top:0; bottom:0; width:1px; background:#ffd700;"></div>
-    <div style="position:absolute; left:${Math.min(99, Math.max(0, critPct))}%; top:50%; transform:translate(-50%,-50%);
-                width:18px; height:36px; background:#ff3333; border:2px solid #fff; border-radius:4px; box-shadow:0 0 8px rgba(255,50,50,0.7);
-                display:flex; align-items:center; justify-content:center; font-size:9px; color:#fff; font-weight:bold;">●</div>
-    <div style="position:absolute; left:${BP_SWEET_LO}%; top:6px; color:#ffd700; font-size:10px; transform:translateX(2px);">${BP_SWEET_LO}%</div>
-    <div style="position:absolute; left:${BP_SWEET_HI}%; top:6px; color:#ffd700; font-size:10px; transform:translateX(2px);">${BP_SWEET_HI}%</div>
-    <div style="position:absolute; right:6px; bottom:4px; color:#ddd; font-size:11px;">치명확률 0% → 100%</div>
-    <div style="position:absolute; left:${Math.min(99, Math.max(0, critPct))}%; bottom:-2px; transform:translateX(-50%); color:#ff3333; font-size:11px; font-weight:bold;">현재 ${critPct.toFixed(1)}%</div>
-  `;
-
-  // Priority: stat upgrade simulation
-  // 각 stat에 standard increase 적용해서 DPS gain 계산
-  const upgrades = [
-    { name: '공격 +1000', delta: { A: 1000 } },
-    { name: '치명 +1000', delta: { C: 1000 } },
-    { name: '관통 +1000', delta: { P: 1000 } },
-    { name: '명중 +1000', delta: { H: 1000 } },
-    { name: '피해보너스 +5%pt', delta: { DB: 5 } },
-    { name: '치명보너스 +10%pt', delta: { __criBonus: 10 } }, // 치명_base × 0.1 추가 (간이)
-    { name: '공격보너스 +10%pt', delta: { __atkBonus: 10 } },
-  ];
-
-  const results = upgrades.map(u => {
-    const ns = { ...s };
-    if (u.delta.A) ns.A += u.delta.A;
-    if (u.delta.C) ns.C += u.delta.C;
-    if (u.delta.P) ns.P += u.delta.P;
-    if (u.delta.H) ns.H += u.delta.H;
-    if (u.delta.DB) ns.DB += u.delta.DB;
-    // 보너스 increase 처리: 현재 base 추정이 어려우니 효과적 stat increase로 변환
-    // 예: 치명보너스 +10%pt = 치명 base × 0.1 추가. base 추정 = 치명 / (보너스/100). 보너스 모르면 가정.
-    if (u.delta.__criBonus) {
-      // 치명_base 추정: 사용자 입력엔 보너스 없음. 평균 ~250% 가정 → base = C / 2.5
-      const base = s.C / 2.5;
-      ns.C += base * u.delta.__criBonus / 100;
-    }
-    if (u.delta.__atkBonus) {
-      const base = s.A / 2.15; // ~215% 가정
-      ns.A += base * u.delta.__atkBonus / 100;
-    }
-    const newDmg = bpDmg(ns);
-    return { name: u.name, gain: (newDmg / curDmg - 1) * 100 };
-  }).sort((a, b) => b.gain - a.gain);
-
-  const maxGain = Math.max(...results.map(r => Math.abs(r.gain)), 0.01);
-  priority.innerHTML = results.map((r, i) => {
-    const isFirst = i === 0;
-    const w = (Math.max(0, r.gain) / maxGain) * 100;
-    const color = i === 0 ? '#7fff7f' : i === 1 ? '#ffd700' : i === 2 ? '#ffe07a' : '#999';
+function scRenderStatInputs() {
+  const buildRow = (cat) => {
+    const p = scState.pairs[cat];
     return `
-      <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:13px;">
-        <div style="min-width:140px; color:${color}; font-weight:${isFirst ? 'bold' : 'normal'};">
-          ${i+1}순위 · ${r.name}
-        </div>
-        <div style="flex:1; height:18px; background:#252538; border-radius:4px; overflow:hidden; position:relative;">
-          <div style="height:100%; width:${w}%; background:${color}; opacity:0.7;"></div>
-          <div style="position:absolute; left:6px; top:0; line-height:18px; color:#fff; font-size:11px; font-weight:bold;">
-            ${r.gain >= 0 ? '+' : ''}${r.gain.toFixed(2)}% DPS
+      <div class="sc-stat-row">
+        <label>${cat}</label>
+        <input type="number" value="${p.final}" data-sc-pair="${cat}" data-sc-field="final" step="1">
+        <span class="sep">·</span>
+        <span class="suffix">보너스</span>
+        <input type="number" value="${p.bonusPct}" data-sc-pair="${cat}" data-sc-field="bonusPct" step="0.1">
+        <span class="suffix">%</span>
+      </div>`;
+  };
+  const buildExtraRow = (cat) => `
+    <div class="sc-stat-row">
+      <label>${cat}</label>
+      <input type="number" value="${scState.extras[cat]}" data-sc-extra="${cat}" step="0.1">
+      <span class="suffix">%</span>
+    </div>`;
+
+  const off = document.getElementById('sc-offense-grid');
+  if (off) {
+    off.style.gridTemplateColumns = 'repeat(auto-fit, minmax(280px, 1fr))';
+    off.style.gap = '8px';
+    off.innerHTML = SC_PAIR_OFFENSE.map(buildRow).join('') + buildExtraRow('피해보너스');
+  }
+  const def = document.getElementById('sc-defense-grid');
+  if (def) {
+    def.style.gridTemplateColumns = 'repeat(auto-fit, minmax(280px, 1fr))';
+    def.style.gap = '8px';
+    def.innerHTML = SC_PAIR_DEFENSE.map(buildRow).join('') + buildExtraRow('피해감소');
+  }
+
+  // 이벤트 바인딩
+  document.querySelectorAll('[data-sc-pair]').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const cat = inp.dataset.scPair, field = inp.dataset.scField;
+      const v = parseFloat(inp.value);
+      scState.pairs[cat][field] = isFinite(v) ? v : 0;
+      scSave();
+      scState.scenarios.forEach((_, i) => scRenderScenarioResult(i));
+      scRenderCompareIfOpen();
+    });
+  });
+  document.querySelectorAll('[data-sc-extra]').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const cat = inp.dataset.scExtra;
+      const v = parseFloat(inp.value);
+      scState.extras[cat] = isFinite(v) ? v : 0;
+      scSave();
+      scState.scenarios.forEach((_, i) => scRenderScenarioResult(i));
+      scRenderCompareIfOpen();
+    });
+  });
+}
+
+// 옵션 배열 → 카테고리별 delta {rawDelta, bonusDelta, extraDelta}
+function scOptionDelta(options) {
+  const rawDelta = {};
+  const bonusDelta = {};
+  const extraDelta = { 피해보너스: 0, 피해감소: 0 };
+  for (const o of options) {
+    const def = scOptDef(o.type);
+    if (def.kind === 'none') continue;
+    const v = +o.val || 0;
+    if (def.kind === 'raw') rawDelta[def.cat] = (rawDelta[def.cat] || 0) + v;
+    else if (def.kind === 'bonus') bonusDelta[def.cat] = (bonusDelta[def.cat] || 0) + v;
+    else if (def.kind === 'extra') extraDelta[def.cat] = (extraDelta[def.cat] || 0) + v;
+  }
+  return { rawDelta, bonusDelta, extraDelta };
+}
+
+// 단일 시나리오 평가 → { affectedCats:Set<cat>, results: {cat: {oldFinal, oldBonus, newFinal, newBonus, diff} or {oldV, newV, diff, isExtra:true}} }
+function scEvalScenario(s) {
+  const curD = scOptionDelta(s.current);
+  const newD = scOptionDelta(s.next);
+  const affected = new Set();
+  const results = {};
+
+  for (const cat of SC_PAIRS) {
+    const rawDelta = (newD.rawDelta[cat] || 0) - (curD.rawDelta[cat] || 0);
+    const bonusDelta = (newD.bonusDelta[cat] || 0) - (curD.bonusDelta[cat] || 0);
+    if (Math.abs(rawDelta) < 1e-9 && Math.abs(bonusDelta) < 1e-9) continue;
+    const p = scState.pairs[cat];
+    const oldFinal = p.final;
+    const oldBonus = p.bonusPct;
+    const oldRawBase = oldBonus > 0 ? oldFinal / (oldBonus / 100) : oldFinal;
+    const newBonus = oldBonus + bonusDelta;
+    const newRawBase = oldRawBase + rawDelta;
+    const newFinal = newRawBase * (newBonus / 100);
+    results[cat] = { oldFinal, oldBonus, newFinal, newBonus, diff: newFinal - oldFinal };
+    affected.add(cat);
+  }
+  for (const cat of ['피해보너스','피해감소']) {
+    const delta = (newD.extraDelta[cat] || 0) - (curD.extraDelta[cat] || 0);
+    if (Math.abs(delta) < 1e-9) continue;
+    const oldV = scState.extras[cat];
+    const newV = oldV + delta;
+    results[cat] = { oldV, newV, diff: newV - oldV, isExtra: true };
+    affected.add(cat);
+  }
+  return { affected, results };
+}
+
+function scRenderScenarios() {
+  const root = document.getElementById('sc-scenarios-container');
+  if (!root) return;
+  const canDelete = scState.scenarios.length > 1;
+
+  root.innerHTML = scState.scenarios.map((s, idx) => {
+    const optRow = (slot, slotIdx, side) => {
+      const opts = SC_OPT_TYPES.map(o =>
+        `<option value="${o.value}" ${o.value === slot.type ? 'selected' : ''}>${o.label}</option>`
+      ).join('');
+      const def = scOptDef(slot.type);
+      const unit = def.unit;
+      const step = (def.kind === 'bonus' || def.kind === 'extra') ? '0.1' : '1';
+      return `
+        <div class="sc-opt-row">
+          <select data-sc-scn="${idx}" data-sc-side="${side}" data-sc-idx="${slotIdx}" data-sc-key="type">${opts}</select>
+          <input type="number" value="${slot.val || 0}" step="${step}"
+                 data-sc-scn="${idx}" data-sc-side="${side}" data-sc-idx="${slotIdx}" data-sc-key="val"
+                 ${def.kind === 'none' ? 'disabled' : ''}>
+          <span class="sc-unit">${unit}</span>
+        </div>`;
+    };
+    return `
+      <div class="sc-scenario-card">
+        <div class="sc-scenario-head">
+          <input type="text" class="sc-scenario-name" data-sc-scn="${idx}" data-sc-key="name" value="${s.name.replace(/"/g,'&quot;')}">
+          <div class="sc-scenario-actions">
+            <button onclick="scResetScenario(${idx})">🔄 리셋</button>
+            ${canDelete ? `<button class="sc-scenario-del" onclick="scDeleteScenario(${idx})">✕ 삭제</button>` : ''}
           </div>
         </div>
-      </div>
-    `;
+        <div class="sc-swap-grid">
+          <div class="sc-swap-col">
+            <h4 style="color:#ffd070; margin:6px 0; font-size:13px;">📌 현재 옵션</h4>
+            ${s.current.map((slot, i) => optRow(slot, i, 'current')).join('')}
+          </div>
+          <div class="sc-swap-col">
+            <h4 style="color:#7fff7f; margin:6px 0; font-size:13px;">✨ 변경 예정 옵션</h4>
+            ${s.next.map((slot, i) => optRow(slot, i, 'next')).join('')}
+          </div>
+        </div>
+        <div class="sc-scenario-result" id="sc-result-${idx}"></div>
+      </div>`;
   }).join('');
 
-  // DPS curve: 치명확률 0~100% 변화 시 DPS
-  const W = 800, Hh = 360;
-  const PAD = { l: 70, r: 30, t: 30, b: 50 };
-  const PW = W - PAD.l - PAD.r;
-  const PH = Hh - PAD.t - PAD.b;
-  const xCrit = pct => PAD.l + (pct / 100) * PW;
-  const points = [];
-  for (let pct = 0; pct <= 100; pct += 2) {
-    // 치명%를 그 값으로 만들려면 치명 = (pct/100) × (A+P)
-    const newC = (pct / 100) * (s.A + s.P);
-    const newS = { ...s, C: newC };
-    points.push({ pct, dmg: bpDmg(newS) });
-  }
-  const yMax = Math.max(...points.map(p => p.dmg)) * 1.05;
-  const yMin = Math.min(...points.map(p => p.dmg)) * 0.95;
-  const yScale = v => PAD.t + PH - ((v - yMin) / (yMax - yMin)) * PH;
-
-  const path = points.map((p, i) =>
-    `${i === 0 ? 'M' : 'L'}${xCrit(p.pct).toFixed(1)},${yScale(p.dmg).toFixed(1)}`
-  ).join(' ');
-
-  // Y axis labels
-  const yTicks = [yMin, (yMin+yMax)/2, yMax];
-
-  curve.innerHTML = `
-    ${[0, 25, 50, 75, 100].map(pct => `
-      <line x1="${xCrit(pct)}" y1="${PAD.t}" x2="${xCrit(pct)}" y2="${PAD.t+PH}" stroke="#333" stroke-width="0.5"/>
-      <text x="${xCrit(pct)}" y="${PAD.t+PH+18}" fill="#ccc" font-size="11" text-anchor="middle">${pct}%</text>
-    `).join('')}
-    ${yTicks.map(v => `
-      <line x1="${PAD.l}" y1="${yScale(v)}" x2="${PAD.l+PW}" y2="${yScale(v)}" stroke="#333" stroke-width="0.5"/>
-      <text x="${PAD.l-6}" y="${yScale(v)+4}" fill="#ccc" font-size="11" text-anchor="end">${fmtBigNum(v)}</text>
-    `).join('')}
-    <line x1="${PAD.l}" y1="${PAD.t}" x2="${PAD.l}" y2="${PAD.t+PH}" stroke="#888"/>
-    <line x1="${PAD.l}" y1="${PAD.t+PH}" x2="${PAD.l+PW}" y2="${PAD.t+PH}" stroke="#888"/>
-    <rect x="${xCrit(BP_SWEET_LO)}" y="${PAD.t}" width="${xCrit(BP_SWEET_HI)-xCrit(BP_SWEET_LO)}" height="${PH}" fill="#ffd700" opacity="0.08"/>
-    <text x="${(xCrit(BP_SWEET_LO)+xCrit(BP_SWEET_HI))/2}" y="${PAD.t-6}" fill="#ffd700" font-size="11" text-anchor="middle">sweet spot</text>
-    <path d="${path}" fill="none" stroke="#4dabf7" stroke-width="2"/>
-    <circle cx="${xCrit(critPct)}" cy="${yScale(curDmg)}" r="6" fill="#ff3333" stroke="#fff" stroke-width="2"/>
-    <text x="${xCrit(critPct)}" y="${yScale(curDmg)-12}" fill="#ff6b6b" font-size="11" text-anchor="middle" font-weight="bold">현재</text>
-    <text x="${(PAD.l+W-PAD.r)/2}" y="${Hh-8}" fill="#ffd700" font-size="13" text-anchor="middle">치명확률 (%)</text>
-    <text x="20" y="${(PAD.t+PH/2)}" fill="#ffd700" font-size="13" text-anchor="middle" transform="rotate(-90 20 ${PAD.t+PH/2})">예상 1타 데미지</text>
-  `;
-
-  // Recommendation — 우선순위 차트의 #1을 그대로 따라감
-  const top = results[0];
-  const top2 = results[1];
-  let recText = `<div style="background:rgba(127,255,127,0.08); border:1px solid rgba(127,255,127,0.35); border-radius:6px; padding:10px 12px; margin-bottom:8px;">
-    <b style="color:#7fff7f;">🥇 1순위: ${top.name}</b> → 약 <b>+${top.gain.toFixed(2)}% DPS</b><br>
-    <span style="color:#ddd; font-size:12px;">🥈 2순위: ${top2.name} (+${top2.gain.toFixed(2)}%)</span>
-  </div>`;
-
-  // 치명확률 영역 정보 (참고용)
-  if (critPct < BP_SWEET_LO) {
-    recText += `<div style="color:#ff8a8a; font-size:12px;">📍 치명확률 ${critPct.toFixed(1)}% — 데이터 검증 영역 (${BP_SWEET_LO}~${BP_SWEET_HI}%) 미달. 치명 효율 높을 가능성.</div>`;
-  } else if (critPct > BP_SWEET_HI) {
-    recText += `<div style="color:#ffd07a; font-size:12px;">📍 치명확률 ${critPct.toFixed(1)}% — 데이터 검증 영역 (${BP_SWEET_LO}~${BP_SWEET_HI}%) 초과. 모델은 치명을 계속 추천하지만 v45~v54 측정 범위 밖이라 실제로 다이미니싱이 더 강할 수 있음. 인게임으로 확인 권장.</div>`;
-  } else {
-    recText += `<div style="color:#7fff7f; font-size:12px;">📍 치명확률 ${critPct.toFixed(1)}% — 데이터 검증 영역 안 (모델 신뢰 ✓).</div>`;
-  }
-
-  if (s.P > s.D) {
-    recText += `<div style="color:#ff8a8a; margin-top:6px;">⚠️ 관통 ${s.P.toLocaleString()}이 적 방어 ${s.D.toLocaleString()}을 초과 — 초과분 (${(s.P-s.D).toLocaleString()})은 무효. 관통 추가 비효율.</div>`;
-  }
-  if (s.H > s.E) {
-    recText += `<div style="color:#ff8a8a; margin-top:6px;">⚠️ 명중 ${s.H.toLocaleString()}이 적 회피 ${s.E.toLocaleString()}을 초과 — 초과분 (${(s.H-s.E).toLocaleString()})은 무효. Miss 거의 안 뜨면 명중 추가 비효율.</div>`;
-  }
-
-  recText += `<div style="background:rgba(255,107,107,0.12); border:1px solid rgba(255,107,107,0.4); border-radius:6px; padding:8px 12px; margin-top:8px; color:#ffb3b3; font-size:13px; font-weight:bold;">
-    ⚠️ Miss 가 뜬다면 <span style="color:#ff6b6b;">명중부터 올리세요</span> (명중이 적 회피보다 부족한 상태). Miss 사라진 후엔 명중 추가는 효과 없음.
-  </div>`;
-  recText += `<div style="margin-top:8px; font-size:12px; color:#aaa;">
-    ⚠️ 모델 가정: v37~v54 측정 fit (β=0.556). 실제 스킬/콤보/룬 효과 별도. 인게임 DPS 결과를 우선 신뢰.
-  </div>`;
-
-  recommend.innerHTML = recText;
-}
-
-function bindBuildPriority() {
-  ['bp-atk','bp-cri','bp-pen','bp-hit','bp-dmg','bp-def','bp-eva'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el && !el._bpBound) {
-      el.addEventListener('input', renderBuildPriority);
-      el._bpBound = true;
-    }
+  // 이벤트 바인딩 (시나리오 내 select / input / 이름)
+  root.querySelectorAll('[data-sc-scn]').forEach(el => {
+    const evt = el.tagName === 'SELECT' ? 'change' : 'input';
+    el.addEventListener(evt, () => {
+      const scn = +el.dataset.scScn;
+      const key = el.dataset.scKey;
+      const s = scState.scenarios[scn];
+      if (!s) return;
+      if (key === 'name') {
+        s.name = el.value || ('시나리오 ' + (scn + 1));
+        scSave();
+        scRenderCompareIfOpen();
+        return;
+      }
+      const side = el.dataset.scSide;
+      const idx = +el.dataset.scIdx;
+      const arr = side === 'current' ? s.current : s.next;
+      if (key === 'type') {
+        arr[idx].type = el.value;
+        scSave();
+        scRenderScenarios(); // unit/disabled 갱신 필요
+        scRenderCompareIfOpen();
+      } else {
+        const v = parseFloat(el.value);
+        arr[idx].val = isFinite(v) ? v : 0;
+        scSave();
+        scRenderScenarioResult(scn);
+        scRenderCompareIfOpen();
+      }
+    });
   });
-  renderBuildPriority();
+
+  // 각 시나리오 결과 렌더
+  scState.scenarios.forEach((_, i) => scRenderScenarioResult(i));
 }
 
-// ===== DPS 계산기 (예측) — 엠블럼 + 속성 통합 (2026-05-03) =====
-// 기존 `emblems` 카탈로그(line ~1421) 사용. 카테고리 키: 기교/지혜/활력.
+function scRenderScenarioResult(idx) {
+  const el = document.getElementById('sc-result-' + idx);
+  if (!el) return;
+  const s = scState.scenarios[idx];
+  const { affected, results } = scEvalScenario(s);
 
-// stat 이름 → DPS 모델 키 매핑 (DPS에 영향)
-const DPS_STAT_KEYS = {
-  '공격': 'A_raw',
-  '치명': 'C_raw',
-  '관통': 'P_raw',
-  '명중': 'H_raw',
-  '공격보너스': 'bA',
-  '치명보너스': 'bC',
-  '관통보너스': 'bP',
-  '명중보너스': 'bH',
-  '피해보너스': 'D',
-};
-
-// 카테고리별 아이콘
-const EMB_CAT_ICON = { '기교': '⚔️', '지혜': '🧠', '활력': '💚' };
-
-// 현재 15 엠블럼 (lvl 80+ 5슬롯 — 5번째는 비워둠, 사용자가 채움)
-let CURRENT_EMBLEMS = {
-  '기교': [
-    { name: '헬 드래곤',   grade: 5 },
-    { name: '광기 흑룡',   grade: 4 },
-    { name: '해츨링 무리', grade: 4 },
-    { name: '조소아오크',  grade: 4 },
-    { name: '',            grade: 0 },
-  ],
-  '지혜': [
-    { name: '광폭룡',         grade: 5 },
-    { name: '물 원소',        grade: 5 },
-    { name: '흡마 옵시디언',  grade: 4 },
-    { name: '샤오크',         grade: 4 },
-    { name: '',               grade: 0 },
-  ],
-  '활력': [
-    { name: '얼음 곰',  grade: 5 },
-    { name: '얼음 곰',  grade: 5 },
-    { name: '옵시디언', grade: 4 },
-    { name: '퀸',       grade: 4 },
-    { name: '',         grade: 0 },
-  ],
-};
-
-// EMBLEM_SWAPS[cat][slotIdx] = null (변경 없음) | { name, grade } (변경)
-let EMBLEM_SWAPS = { '기교': [null,null,null,null,null], '지혜': [null,null,null,null,null], '활력': [null,null,null,null,null] };
-
-function getEmblemDef(category, name) {
-  if (!emblems || !emblems[category]) return null;
-  return emblems[category].find(e => e.name === name);
-}
-
-// 엠블럼 stat 값 파싱 ("+460", "+10.5%", "+86000" 등)
-function parseStatValue(raw) {
-  if (!raw) return 0;
-  const s = String(raw).replace(/[+%]/g, '').trim();
-  return parseFloat(s) || 0;
-}
-
-// 카탈로그 엠블럼 → raw stat 객체 {A_raw, C_raw, P_raw, H_raw, bA, bC, bP, bH, D}
-function getEmblemRawStats(category, name, grade) {
-  const def = getEmblemDef(category, name);
-  const empty = { A_raw:0, C_raw:0, P_raw:0, H_raw:0, bA:0, bC:0, bP:0, bH:0, D:0 };
-  if (!def) return empty;
-  const g = def.grades[grade - 1];
-  if (!g) return empty;
-  const r = { ...empty };
-  const k1 = DPS_STAT_KEYS[def.s1];
-  const k2 = DPS_STAT_KEYS[def.s2];
-  if (k1) r[k1] = parseStatValue(g.v1);
-  if (k2) r[k2] = parseStatValue(g.v2);
-  return r;
-}
-
-// raw stat → DPS 계산용 final delta {A, C, P, H, D}
-// 게임 공식: final = base × (bonusPct/100), 입력값 138.8% → ×1.388 (총 배율)
-// 정확 공식: new_final = (base + Δraw) × ((bonus + Δbonus)/100)
-// — base × Δb/100 + Δraw × bonus/100 만 더하면 cross term Δraw × Δb/100 누락됨
-function rawToFinalDelta(raw, bonuses) {
-  const factor = (b) => (b || 0) / 100;
-  const apply = (curFinal, curBonus, dRaw, dBonus) => {
-    const f = factor(curBonus);
-    if (f <= 0) return (dRaw || 0); // safeguard
-    const base = curFinal / f;
-    const newBase = base + (dRaw || 0);
-    const newFinal = newBase * factor(curBonus + (dBonus || 0));
-    return newFinal - curFinal;
-  };
-  return {
-    A: apply(bonuses.A_cur || 0, bonuses.bA, raw.A_raw, raw.bA),
-    C: apply(bonuses.C_cur || 0, bonuses.bC, raw.C_raw, raw.bC),
-    P: apply(bonuses.P_cur || 0, bonuses.bP, raw.P_raw, raw.bP),
-    H: apply(bonuses.H_cur || 0, bonuses.bH, raw.H_raw, raw.bH),
-    D: raw.D || 0,
-  };
-}
-
-// 짧은 표기용
-function statShortStr(raw) {
-  const parts = [];
-  if (raw.A_raw) parts.push(`공+${raw.A_raw}`);
-  if (raw.C_raw) parts.push(`치+${raw.C_raw}`);
-  if (raw.P_raw) parts.push(`관+${raw.P_raw}`);
-  if (raw.H_raw) parts.push(`명+${raw.H_raw}`);
-  if (raw.bA) parts.push(`공보+${raw.bA}%`);
-  if (raw.bC) parts.push(`치보+${raw.bC}%`);
-  if (raw.bP) parts.push(`관보+${raw.bP}%`);
-  if (raw.bH) parts.push(`명보+${raw.bH}%`);
-  if (raw.D) parts.push(`피+${raw.D}%`);
-  return parts.join(' ');
-}
-
-// 비-DPS stat 표기 (참고용)
-function fullStatStr(category, name, grade) {
-  const def = getEmblemDef(category, name);
-  if (!def) return '';
-  const g = def.grades[grade - 1];
-  if (!g) return '';
-  return `${def.s1}${g.v1} · ${def.s2}${g.v2}`;
-}
-
-function getEmblemIcon(category, name) {
-  return EMB_CAT_ICON[category] || '💎';
-}
-
-// 엠블럼이 보유한 유효 급수 list
-function emblemAvailableGrades(category, name) {
-  const def = getEmblemDef(category, name);
-  if (!def) return [];
-  const out = [];
-  for (let g = 1; g <= 5; g++) if (def.grades[g - 1]) out.push(g);
-  return out;
-}
-
-function renderEmblemSlots() {
-  for (const cat of ['기교', '지혜', '활력']) {
-    const row = document.getElementById(`emb-row-${cat}`);
-    if (!row) continue;
-    row.innerHTML = '';
-    CURRENT_EMBLEMS[cat].forEach((emb, idx) => {
-      const slot = document.createElement('div');
-      slot.className = 'emb-slot';
-      const def = getEmblemDef(cat, emb.name);
-      const grades = emblemAvailableGrades(cat, emb.name);
-      // grade가 사용 불가하면 가용 최고급으로 보정
-      if (grades.length && !grades.includes(emb.grade)) emb.grade = grades[grades.length-1];
-      const fullStr = fullStatStr(cat, emb.name, emb.grade);
-      const allEmb = (emblems && emblems[cat]) ? emblems[cat] : [];
-      slot.innerHTML = `
-        <div class="emb-icon">${EMB_CAT_ICON[cat]}</div>
-        <select onchange="updateEmblemName('${cat}', ${idx}, this.value)">
-          ${allEmb.map(e => `<option value="${e.name}" ${e.name===emb.name?'selected':''}>${e.name}${e.unique?' ⭐':''}</option>`).join('')}
-        </select>
-        <select onchange="updateEmblemGrade('${cat}', ${idx}, parseInt(this.value))">
-          ${grades.map(g => `<option value="${g}" ${g===emb.grade?'selected':''}>${g}급</option>`).join('')}
-        </select>
-        <div class="emb-info">${fullStr}</div>
-      `;
-      row.appendChild(slot);
-    });
-  }
-  updateDpsView();
-}
-
-function updateEmblemName(cat, idx, name) {
-  CURRENT_EMBLEMS[cat][idx].name = name;
-  // 같은 슬롯의 swap도 invalidate (이름 바뀌면 swap 의미 없어짐)
-  if (EMBLEM_SWAPS[cat]) EMBLEM_SWAPS[cat][idx] = null;
-  renderEmblemSlots();
-}
-
-function updateEmblemGrade(cat, idx, grade) {
-  CURRENT_EMBLEMS[cat][idx].grade = grade;
-  if (EMBLEM_SWAPS[cat]) EMBLEM_SWAPS[cat][idx] = null;
-  renderEmblemSlots();
-}
-
-// DPS 예측기에서 슬롯의 swap target 변경 (현재 엠블럼은 안 바뀜)
-function setSwap(cat, idx, name, grade) {
-  if (!EMBLEM_SWAPS[cat]) return;
-  if (!name) { EMBLEM_SWAPS[cat][idx] = null; }
-  else {
-    const cur = CURRENT_EMBLEMS[cat][idx];
-    // 현재와 동일하면 swap 제거
-    if (cur.name === name && cur.grade === grade) EMBLEM_SWAPS[cat][idx] = null;
-    else EMBLEM_SWAPS[cat][idx] = { name, grade };
-  }
-  updateDpsView();
-}
-
-function setSwapName(cat, idx, name) {
-  if (!name) { EMBLEM_SWAPS[cat][idx] = null; updateDpsView(); return; }
-  const grades = emblemAvailableGrades(cat, name);
-  const grade = grades[grades.length - 1] || 4;
-  setSwap(cat, idx, name, grade);
-}
-
-function setSwapGrade(cat, idx, grade) {
-  const swap = EMBLEM_SWAPS[cat][idx];
-  if (!swap) return;
-  setSwap(cat, idx, swap.name, grade);
-}
-
-function resetAllSwaps() {
-  EMBLEM_SWAPS = { '기교': [null,null,null,null,null], '지혜': [null,null,null,null,null], '활력': [null,null,null,null,null] };
-  updateDpsView();
-}
-
-// 경험 모델 (2026-05-10 raw-sum 적용, 중국 서버 컨센서스 "raw 1:1" 반영):
-//   DPS ∝ sum_raw^β × (1 + D/100)
-//   sum_raw = A_raw + C_raw + P_raw_capped (raw = final / (bonus%/100))
-//   P_raw_capped: P_final이 def 미만이면 그대로, 이상이면 def에서 cap (def는 final 단위)
-//   β = 1.09 (16점 fit, RMS 1.5%)
-// 의미: 공격/치명/관통(under-cap)/명중 모두 raw 1점 = 1점 동일 효율.
-//       per-percent 효율은 stat별로 다름 (bonus% 영향).
-// 허수아비 적정 관통 약 9000. T=0이면 over-pierce로 가정.
-const MODEL_BETA = 1.09;
-
-function getCurrentStats() {
-  const get = id => parseFloat((document.getElementById(id)||{}).value || 0) || 0;
-  return {
-    A: get('bp-atk'), C: get('bp-cri'), P: get('bp-pen'),
-    H: get('bp-hit'), D: get('bp-dmg'),
-    T: Math.max(0, get('bp-tdef')),
-  };
-}
-
-function getCurrentBonuses() {
-  const get = id => parseFloat((document.getElementById(id)||{}).value || 0) || 0;
-  const cur = getCurrentStats();
-  return {
-    bA: get('bp-batk'), bC: get('bp-bcri'), bP: get('bp-bpen'), bH: get('bp-bhit'),
-    A_cur: cur.A, C_cur: cur.C, P_cur: cur.P, H_cur: cur.H,
-  };
-}
-
-function getEmblemRawDelta() {
-  // 모든 swap 슬롯의 raw delta 합산
-  const totalRaw = { A_raw:0, C_raw:0, P_raw:0, H_raw:0, bA:0, bC:0, bP:0, bH:0, D:0 };
-  for (const cat of ['기교','지혜','활력']) {
-    if (!EMBLEM_SWAPS[cat]) continue;
-    EMBLEM_SWAPS[cat].forEach((swap, idx) => {
-      if (!swap) return;
-      const cur = CURRENT_EMBLEMS[cat][idx];
-      const oldRaw = getEmblemRawStats(cat, cur.name, cur.grade);
-      const newRaw = getEmblemRawStats(cat, swap.name, swap.grade);
-      for (const k of Object.keys(totalRaw)) totalRaw[k] += (newRaw[k]||0) - (oldRaw[k]||0);
-    });
-  }
-  return totalRaw;
-}
-
-function hasAnySwap() {
-  for (const cat of ['기교','지혜','활력']) {
-    if (!EMBLEM_SWAPS[cat]) continue;
-    if (EMBLEM_SWAPS[cat].some(s => s !== null)) return true;
-  }
-  return false;
-}
-
-// raw-sum 모델 (pierce weight 적용). bonuses는 {bA, bC, bP} (%), 미제공이면 100% 가정.
-const PIERCE_WEIGHT = 0.70; // 사용자 측정 (2026-05-10): pierce per raw ≈ 70% × crit per raw
-function toPredict(stats, bonuses) {
-  const A = Math.max(0, stats.A);
-  const C = Math.max(0, stats.C);
-  const P = Math.max(0, stats.P);
-  const D = Math.max(0, stats.D);
-  const T = Math.max(0, stats.T || 0);
-  const b = bonuses || {};
-  const bA = (b.bA && b.bA > 0) ? b.bA : 100;
-  const bC = (b.bC && b.bC > 0) ? b.bC : 100;
-  const bP = (b.bP && b.bP > 0) ? b.bP : 100;
-  // 관통은 final 단위에서 cap → raw로 변환, raw에 weight 적용
-  const P_eff_final = T > 0 ? Math.min(P, T) : P;
-  const A_raw = A / (bA / 100);
-  const C_raw = C / (bC / 100);
-  const P_raw = P_eff_final / (bP / 100);
-  const sumRaw = Math.max(1, A_raw + C_raw + PIERCE_WEIGHT * P_raw);
-  return Math.pow(sumRaw, MODEL_BETA) * (1 + D / 100);
-}
-
-function getSliderRawDelta() {
-  // 슬라이더 입력 → raw 단위로 환산 (dps-dA 는 final 단위라 raw 로 변환)
-  const get = id => parseFloat((document.getElementById(id)||{}).value || 0) || 0;
-  const bonuses = getCurrentBonuses();
-  const factor = (b) => (b || 0) / 100;
-  const toRaw = (sliderFinal, bonus) => {
-    const f = factor(bonus);
-    return f > 0 ? sliderFinal / f : sliderFinal;
-  };
-  return {
-    A_raw: toRaw(get('dps-dA'), bonuses.bA),
-    C_raw: toRaw(get('dps-dC'), bonuses.bC),
-    P_raw: toRaw(get('dps-dP'), bonuses.bP),
-    H_raw: toRaw(get('dps-dH'), bonuses.bH),
-    bA: get('dps-dbA'), bC: get('dps-dbC'),
-    bP: get('dps-dbP'), bH: get('dps-dbH'),
-    D: get('dps-dD'),
-  };
-}
-
-function updateDpsView() {
-  // === ② 엠블럼 변경 (15 슬롯, 카테고리별) ===
-  for (const cat of ['기교','지혜','활력']) {
-    const row = document.getElementById(`dps-swap-${cat}`);
-    if (!row) continue;
-    let html = '';
-    CURRENT_EMBLEMS[cat].forEach((cur, idx) => {
-      const swap = EMBLEM_SWAPS[cat][idx];
-      const isChanged = swap !== null;
-      const allEmb = (emblems && emblems[cat]) ? emblems[cat] : [];
-      const selectedName = swap ? swap.name : cur.name;
-      const selectedGrade = swap ? swap.grade : cur.grade;
-      const grades = emblemAvailableGrades(cat, selectedName);
-      html += `
-        <div class="emb-swap-slot ${isChanged ? 'changed' : ''}">
-          <div class="swap-current">현재: <b>${cur.name} ${cur.grade}급</b>${isChanged ? `<span class="swap-arrow">→</span><b style="color:#7fff7f;">${swap.name} ${swap.grade}급</b>` : ''}</div>
-          <select onchange="setSwapName('${cat}', ${idx}, this.value)">
-            <option value="">-- 변경 안 함 --</option>
-            ${allEmb.map(e => `<option value="${e.name.replace(/"/g, '&quot;')}" ${e.name===selectedName && isChanged ? 'selected' : ''}>${e.name}${e.unique?' ⭐':''}</option>`).join('')}
-          </select>
-          ${isChanged ? `
-          <select onchange="setSwapGrade('${cat}', ${idx}, parseInt(this.value))">
-            ${grades.map(g => `<option value="${g}" ${g===selectedGrade?'selected':''}>${g}급</option>`).join('')}
-          </select>
-          <button class="reset-btn" onclick="setSwap('${cat}', ${idx}, null, null)">리셋</button>
-          ` : ''}
-        </div>`;
-    });
-    row.innerHTML = html;
-  }
-
-  // === 현재 빌드 + 예측 결과 ===
-  const cur = getCurrentStats();
-  const oldP = cur.A + cur.P > 0 ? cur.C / (cur.A + cur.P) : 0;
-  // 슬라이더 + 엠블럼 swap raw delta 합산 후 한 번에 final delta 변환 (cross term 보존)
-  const sliderRaw = getSliderRawDelta();
-  const embRaw = getEmblemRawDelta();
-  const totalRaw = {
-    A_raw: sliderRaw.A_raw + embRaw.A_raw,
-    C_raw: sliderRaw.C_raw + embRaw.C_raw,
-    P_raw: sliderRaw.P_raw + embRaw.P_raw,
-    H_raw: sliderRaw.H_raw + embRaw.H_raw,
-    bA: sliderRaw.bA + embRaw.bA, bC: sliderRaw.bC + embRaw.bC,
-    bP: sliderRaw.bP + embRaw.bP, bH: sliderRaw.bH + embRaw.bH,
-    D: sliderRaw.D + embRaw.D,
-  };
-  const delta = rawToFinalDelta(totalRaw, getCurrentBonuses());
-
-  // 현재 빌드 카드
-  const curEl = document.getElementById('dps-current');
-  if (curEl) {
-    const overP = cur.T > 0 && cur.P > cur.T;
-    const tdefMsg = cur.T > 0
-      ? ` · 대상방어 <b>${cur.T.toLocaleString()}</b>${overP ? ` <span style="color:#ff8a8a;">(관통 ${(cur.P-cur.T).toLocaleString()} 낭비)</span>` : ''}`
-      : '';
-    curEl.innerHTML = `<div style="font-size:13px; line-height:1.6;">
-      <span style="color:#aaa;">현재 빌드:</span>
-      공 <b>${cur.A}</b> · 치 <b>${cur.C}</b> · 관 <b>${cur.P}</b> · 명 <b>${cur.H}</b> · 피 <b>${cur.D}%</b>
-      · 치명% <b>${(oldP*100).toFixed(1)}%</b>${tdefMsg}
-    </div>`;
-  }
-
-  const resultEl = document.getElementById('dps-result');
-  if (!resultEl) return;
-
-  const allZero = Math.abs(delta.A) < 0.01 && Math.abs(delta.C) < 0.01 && Math.abs(delta.P) < 0.01 && Math.abs(delta.H) < 0.01 && Math.abs(delta.D) < 0.01;
-  if (allZero && !hasAnySwap()) {
-    resultEl.innerHTML = '<span style="color:#aaa; font-size:12px;">속성 또는 엠블럼을 변경하면 예측 결과가 나타납니다.</span>';
+  const hasAny = s.current.some(o => scOptDef(o.type).kind !== 'none')
+              || s.next.some(o => scOptDef(o.type).kind !== 'none');
+  if (!hasAny) {
+    el.innerHTML = `<div class="hint" style="margin:0;">현재 옵션과 변경 예정 옵션을 선택하면 결과가 표시됩니다.</div>`;
     return;
   }
 
-  const next = {
-    A: cur.A + delta.A, C: cur.C + delta.C, P: cur.P + delta.P,
-    H: cur.H + delta.H, D: cur.D + delta.D, T: cur.T,
-  };
-  const newP = next.A + next.P > 0 ? next.C / (next.A + next.P) : 0;
-
-  const bonuses = getCurrentBonuses();
-  const oldDPS = toPredict(cur, bonuses);
-  const newDPS = toPredict(next, bonuses);
-  const pct = (newDPS / oldDPS - 1) * 100;
-  // 기여 분해: sumRaw 변화 vs 피해보너스 변화를 분리
-  const rawComp = (s) => {
-    const bA = (bonuses.bA && bonuses.bA > 0) ? bonuses.bA : 100;
-    const bC = (bonuses.bC && bonuses.bC > 0) ? bonuses.bC : 100;
-    const bP = (bonuses.bP && bonuses.bP > 0) ? bonuses.bP : 100;
-    const Peff = s.T > 0 ? Math.min(s.P, s.T) : s.P;
-    return s.A / (bA/100) + s.C / (bC/100) + Peff / (bP/100);
-  };
-  const oldSum = Math.max(1, rawComp(cur));
-  const newSum = Math.max(1, rawComp(next));
-  const sumContrib = (Math.pow(newSum / oldSum, MODEL_BETA) - 1) * 100;
-  const dContrib = ((1 + next.D/100) / (1 + cur.D/100) - 1) * 100;
-
-  let verdict, verdictColor;
-  if (pct > 1) { verdict = '🟢 좋은 swap. 진행 추천.'; verdictColor = '#7fff7f'; }
-  else if (pct < -1) { verdict = '🔴 나쁜 swap. 비추천.'; verdictColor = '#ff7070'; }
-  else if (pct > 0.3) { verdict = '🟡 약간 좋음.'; verdictColor = '#ffd070'; }
-  else if (pct < -0.3) { verdict = '🟡 약간 나쁨.'; verdictColor = '#ffa050'; }
-  else { verdict = '⚪ 차이 미미 (측정 noise 이내).'; verdictColor = '#aaa'; }
-
-  const r0 = v => Math.round(v);
+  const r0 = v => Math.round(v).toLocaleString();
   const r1 = v => (Math.round(v * 10) / 10).toFixed(1);
-  const sgn = v => { const r = r0(v); return r >= 0 ? `+${r}` : `${r}`; };
-  const sgn1 = v => v >= 0 ? `+${r1(v)}` : `${r1(v)}`;
-  const col = v => v > 0.5 ? '#7fff7f' : v < -0.5 ? '#ff7070' : '#ddd';
-  let html = `
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:12px;">
-      <div>
-        <div style="color:#aaa; font-size:11px; margin-bottom:4px;">현재</div>
-        <div style="font-size:12px; line-height:1.6;">
-          공 ${cur.A} · 치 ${cur.C} · 관 ${cur.P}<br>
-          명 ${cur.H} · 피 ${cur.D}%<br>
-          치명%: <b>${(oldP*100).toFixed(1)}%</b>
-        </div>
-      </div>
-      <div>
-        <div style="color:#aaa; font-size:11px; margin-bottom:4px;">변경 후</div>
-        <div style="font-size:12px; line-height:1.6;">
-          공 <b style="color:${col(delta.A)}">${r0(next.A)}</b> (${sgn(delta.A)}) · 치 <b style="color:${col(delta.C)}">${r0(next.C)}</b> (${sgn(delta.C)})<br>
-          관 <b style="color:${col(delta.P)}">${r0(next.P)}</b> (${sgn(delta.P)}) · 명 <b style="color:${col(delta.H)}">${r0(next.H)}</b> (${sgn(delta.H)})<br>
-          피 <b style="color:${col(delta.D)}">${r1(next.D)}%</b> (${sgn1(delta.D)}) · 치명%: <b>${(newP*100).toFixed(1)}%</b>
-        </div>
-      </div>
+  const fmtDiff = (diff, isPct) => {
+    const cls = Math.abs(diff) < 0.05 ? 'same' : (diff > 0 ? 'up' : 'down');
+    const sign = diff > 0 ? '+' : '';
+    const txt = isPct ? `${sign}${r1(diff)}%pt` : `${sign}${r0(diff)}`;
+    return `<span class="sc-r-diff ${cls}">${txt}</span>`;
+  };
+
+  const rowsHTML = [];
+  for (const cat of SC_PAIRS) {
+    if (!affected.has(cat)) continue;
+    const r = results[cat];
+    rowsHTML.push(`
+      <div class="sc-result-row">
+        <span class="sc-r-cat">${cat}</span>
+        <span class="sc-r-cur">${r0(r.oldFinal)}<br><span class="sc-result-bonus">보너스 ${r1(r.oldBonus)}%</span></span>
+        <span class="sc-r-arrow">→</span>
+        <span class="sc-r-new">${r0(r.newFinal)}<br><span class="sc-result-bonus">보너스 ${r1(r.newBonus)}%</span></span>
+        ${fmtDiff(r.diff, false)}
+      </div>`);
+  }
+  for (const cat of ['피해보너스','피해감소']) {
+    if (!affected.has(cat)) continue;
+    const r = results[cat];
+    rowsHTML.push(`
+      <div class="sc-result-row">
+        <span class="sc-r-cat">${cat}</span>
+        <span class="sc-r-cur">${r1(r.oldV)}%</span>
+        <span class="sc-r-arrow">→</span>
+        <span class="sc-r-new">${r1(r.newV)}%</span>
+        ${fmtDiff(r.diff, true)}
+      </div>`);
+  }
+  if (rowsHTML.length === 0) {
+    el.innerHTML = `<div class="hint" style="margin:0;">선택한 옵션이 어떤 스탯에도 영향을 주지 않습니다.</div>`;
+    return;
+  }
+  el.innerHTML = `
+    <div class="sc-result-row" style="border-bottom:1px solid #555; color:#888; font-size:11px; font-weight:bold;">
+      <span>스탯</span><span style="text-align:right;">현재</span><span></span><span>변경 후</span><span style="text-align:right;">차이</span>
     </div>
-    <div style="text-align:center; padding:14px; background:rgba(0,0,0,0.3); border-radius:8px; margin-bottom:10px;">
-      <div style="color:#aaa; font-size:11px; margin-bottom:4px;">예측 ΔDPS</div>
-      <div style="font-size:28px; font-weight:bold; color:${pct>0.3?'#7fff7f':pct<-0.3?'#ff7070':'#ddd'};">
-        ${pct>=0?'+':''}${pct.toFixed(2)}%
-      </div>
-    </div>
-    <table style="width:100%; border-collapse:collapse; font-size:12px; margin-bottom:10px;">
-      <thead>
-        <tr style="border-bottom:1px solid #555;"><th style="text-align:left; padding:5px 6px; color:#aaa; font-weight:normal;">기여</th><th style="text-align:right; padding:5px 6px; color:#aaa; font-weight:normal;">단독 효과</th></tr>
-      </thead>
-      <tbody>
-        <tr style="border-bottom:1px solid #2a2a3e;">
-          <td style="padding:5px 6px;">sum_raw (공+치+관cap, β=1.09)</td>
-          <td style="text-align:right; padding:5px 6px; color:${sumContrib>0?'#7fff7f':sumContrib<0?'#ff7070':'#ddd'};"><b>${sumContrib>=0?'+':''}${sumContrib.toFixed(2)}%</b></td>
-        </tr>
-        <tr style="border-bottom:1px solid #2a2a3e;">
-          <td style="padding:5px 6px;">피해보너스 (1+D/100)</td>
-          <td style="text-align:right; padding:5px 6px; color:${dContrib>0?'#7fff7f':dContrib<0?'#ff7070':'#ddd'};"><b>${dContrib>=0?'+':''}${dContrib.toFixed(2)}%</b></td>
-        </tr>
-      </tbody>
-    </table>
-    <div style="text-align:center; font-size:14px; padding:8px; background:rgba(255,255,255,0.04); border-radius:6px; color:${verdictColor};">
-      <b>${verdict}</b>
-    </div>
+    ${rowsHTML.join('')}
   `;
-  resultEl.innerHTML = html;
 }
 
-// stat input 변경 시 재계산
-['bp-atk','bp-cri','bp-pen','bp-hit','bp-dmg','bp-tdef',
- 'bp-batk','bp-bcri','bp-bpen','bp-bhit',
- 'dps-dA','dps-dC','dps-dP','dps-dH','dps-dD',
- 'dps-dbA','dps-dbC','dps-dbP','dps-dbH'].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) el.addEventListener('input', () => {
-    if (document.getElementById('view-crit').style.display !== 'none') updateDpsView();
-  });
-});
+function scRenderCompare() {
+  const el = document.getElementById('sc-compare-body');
+  if (!el) return;
+
+  // 모든 시나리오 평가 → 영향 받은 카테고리 union
+  const evals = scState.scenarios.map(s => scEvalScenario(s));
+  const allCats = new Set();
+  evals.forEach(e => e.affected.forEach(c => allCats.add(c)));
+
+  if (allCats.size === 0) {
+    el.innerHTML = `<div class="hint" style="margin:0;">옵션을 입력한 시나리오가 없습니다. 시나리오 카드에서 현재/변경 예정 옵션을 선택해주세요.</div>`;
+    return;
+  }
+
+  const r0 = v => Math.round(v).toLocaleString();
+  const r1 = v => (Math.round(v * 10) / 10).toFixed(1);
+  const orderedCats = [...SC_PAIRS, '피해보너스', '피해감소'].filter(c => allCats.has(c));
+
+  const headerCells = ['<th>스탯</th>', '<th>기본</th>',
+    ...scState.scenarios.map(s => `<th title="${s.name.replace(/"/g,'&quot;')}">${s.name.replace(/</g,'&lt;')}</th>`)
+  ].join('');
+
+  const bodyRows = orderedCats.map(cat => {
+    const isExtra = cat === '피해보너스' || cat === '피해감소';
+    let baseHTML;
+    if (isExtra) {
+      const v = scState.extras[cat];
+      baseHTML = `<td class="cmp-base">${r1(v)}%</td>`;
+    } else {
+      const p = scState.pairs[cat];
+      baseHTML = `<td class="cmp-base">${r0(p.final)}<span class="cmp-sub">보너스 ${r1(p.bonusPct)}%</span></td>`;
+    }
+    const cells = evals.map(ev => {
+      const r = ev.results[cat];
+      if (!r) {
+        if (isExtra) {
+          return `<td class="cmp-same">${r1(scState.extras[cat])}%<span class="cmp-sub">변화 없음</span></td>`;
+        }
+        const p = scState.pairs[cat];
+        return `<td class="cmp-same">${r0(p.final)}<span class="cmp-sub">변화 없음</span></td>`;
+      }
+      const cls = Math.abs(r.diff) < 0.05 ? 'cmp-same' : (r.diff > 0 ? 'cmp-up' : 'cmp-down');
+      const sign = r.diff > 0 ? '+' : '';
+      if (r.isExtra) {
+        return `<td class="${cls}">${r1(r.newV)}%<span class="cmp-sub">${sign}${r1(r.diff)}%pt</span></td>`;
+      }
+      return `<td class="${cls}">${r0(r.newFinal)}<span class="cmp-sub">${sign}${r0(r.diff)} · 보너스 ${r1(r.newBonus)}%</span></td>`;
+    }).join('');
+    return `<tr><td>${cat}</td>${baseHTML}${cells}</tr>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="hint" style="margin:0 0 8px;">각 시나리오는 <b>기본 스탯</b>에서 독립 계산됩니다. 셀에는 <b>변경 후 최종값</b>과 <b>차이(↑↓)</b>가 표시됩니다.</div>
+    <div style="overflow-x:auto;">
+      <table class="sc-compare-table">
+        <thead><tr>${headerCells}</tr></thead>
+        <tbody>${bodyRows}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function scRenderAll() {
+  scRenderStatInputs();
+  scRenderScenarios();
+  scRenderCompareIfOpen();
+}
 
 // 상단 메뉴(계산기/도움말) 뷰 전환
 document.querySelectorAll('.menu-btn').forEach(btn => {
@@ -6499,10 +6254,10 @@ document.querySelectorAll('.menu-btn').forEach(btn => {
     document.getElementById('view-home').style.display = view === 'home' ? '' : 'none';
     document.getElementById('view-calculator').style.display = view === 'calculator' ? '' : 'none';
     document.getElementById('view-rune').style.display = view === 'rune' ? '' : 'none';
-    document.getElementById('view-crit').style.display = view === 'crit' ? '' : 'none';
+    document.getElementById('view-stat').style.display = view === 'stat' ? '' : 'none';
     document.getElementById('view-help').style.display = view === 'help' ? '' : 'none';
     if (view === 'rune') renderRuneView();
-    if (view === 'crit') renderEmblemSlots();
+    if (view === 'stat') scRenderAll();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 });
